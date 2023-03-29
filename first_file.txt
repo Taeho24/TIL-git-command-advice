@@ -1,0 +1,3 @@
+#git config--list
+#git config user.name "Git name"
+#git config user.email "Git email"
