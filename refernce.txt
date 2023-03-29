@@ -17,4 +17,10 @@ https://github.com/boostcampwm-2022
 이슈트랙커
 commit 메시지 에 연동
 
-마크다운 문법공부
+마크다운 문법공부!
+
+git remote add origin [깃헙주소]
+- [깃헙주소]를 origin 이라는 명칭으로 즐겨찾기생성
+git init (Master branch .git 저장소 생성)
+git branch -M main (Master branch를 Main branch로 변경)
+git push origin main 
