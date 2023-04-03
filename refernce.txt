@@ -30,6 +30,9 @@ git switch [branch이름]
 // branch간 이동 명령어
 git branch // 현재 branch 목록
 
-git reest HEAD~2
+git reset HEAD~2
+
+git reset
+git push -f
 
 https://git-school.github.io/visualizing-git/
