@@ -1,0 +1,161 @@
+#include <iostream>
+#include <cmath> // pow()함수와 sqrt()함수 사용
+
+using namespace std;
+namespace area {
+	double Tri(double a, double b, double c) {//삼각형의 넓이를 구하는 함수 정립 //(세변의 길이 변수)
+		if (a > b) {//a,b,c의 크기비교
+			if (b > c) {//c<b<a 인 상황
+				double n = c;
+				c = a;
+				a = n;
+			}
+			else if (a > c) {//b<c<a 인 상황
+				double n = b;
+				b = c;
+				c = a;
+				a = n;
+			}
+			else {//b<a<c 인 상황
+				double n = a;
+				a = b;
+				b = n;
+			}
+		}
+		else if (b > c) {//a<=b 정리 완료
+			if (a > c) {//c<a<b 인 상황
+				double n = b;
+				b = a;
+				a = c;
+				c = n;
+			}
+			else {//a<c<b 인 상황
+				double n = b;
+				b = c;
+				c = n;
+			}
+		}//a<=b<=c로 정리 완료
+		cout << endl << "각각의 point 사이의 거리는 - 작은 순서대로" << endl << a << endl << b << endl << c << endl;//순서 확인용
+		
+		if (a == 0 || b == 0 || c == 0) {//좌표가 겹친 경우
+			cout << endl << "삼각형이 아닙니다."; 
+			return 0;
+		}
+		else if (a + b == c) {//한 각이 0도 이거나 180도인 경우
+			cout << endl << "삼각형이 아닙니다.";
+			return 0;
+		}
+		if (a == c) {//세 변의 길이가 모두 같을 때
+			cout << endl << "정삼각형입니다.";
+		}
+		else if (a == b || b == c) {//두 변의 길이가 같을 때
+			if (c == sqrt(pow(a, 2) + pow(b, 2))) {//피타고라스 정리
+				cout << endl << "직각 이등변 삼각형입니다.";
+			}
+			else {
+				cout << endl << "이등변 삼각형입니다.";
+			}
+		}
+		else if (c == sqrt(pow(a, 2) + pow(b, 2))) {//피타고라스 정리
+			cout << endl << "직각삼각형입니다.";
+		}
+		double s = (a + b + c) / 2;
+		return sqrt(s * (s - a) * (s - b) * (s - c));//헤론의 공식
+	}
+	double Squ(double a, double b, double c, double d, double e, double f) {//사각형의 넓이를 구하는 함수 정립 //(네 변과 대각선의 길이 변수)
+		if (a != b != c != d) {//정사각형이면 a,b,c,d는 한 변이며 e,f는 대각선이다.
+			cout << endl << "정사각형이 아닙니다.";
+			return 0;
+		}
+		else if (e != f) {
+			cout << endl << "정사각형이 아닙니다.";
+			return 0;
+		}
+		//방법1. 밑변*높이  방법2. 대각선*대각선/2 
+		else if(a == 0 || e == 0) {//좌표가 겹친 경우
+			cout << endl << "정사각형이 아닙니다.";
+			return 0;
+		}
+		else {//대각선으로 넓이 구하는 공식
+			return e * f/2;
+		}
+	}
+}
+ int main() {
+	 int A1 = 0, A2 = 0, B1 = 0, B2 = 0, C1 = 0, C2 = 0, D1 = 0, D2 = 0;// 좌표를 지정할때 각 point의 좌표 변수
+	 int st;//도형의 모양 판단 변수
+
+	 cout << "삼각형과 사각형을 구하는 프로그램" << endl << endl;
+	 cout <<"넓이를 구하고자 하는 도형이 삼각형이면 3을 사각형이라면 4를 누르세요." << endl;
+	 cout << "좌표의 개수는? ";//도형의 모양 판단
+	 cin >> st;
+	 if (st == 3) {//삼각형인 경우
+		 cout <<endl<< "삼각형의 point좌푯값을 입력하시오" << endl;
+		 cout << "A의 x값: ";
+		 cin >> A1;
+		 cout << "A의 y값: ";
+		 cin >> A2;
+		 cout << endl<< "B의 x값: ";
+		 cin >> B1;
+		 cout << "B의 y값: ";
+		 cin >> B2;
+		 cout << endl << "C의 x값: ";
+		 cin >> C1;
+		 cout << "C의 y값: ";
+		 cin >> C2;//좌푯값 등록 완료
+		 
+		 double S1 = sqrt(pow(A1 - B1, 2) + pow(A2 - B2, 2));//A point와 B point사이의 거리 변수
+		 double S2 = sqrt(pow(B1 - C1, 2) + pow(B2 - C2, 2));//B point와 C point사이의 거리 변수
+		 double S3 = sqrt(pow(C1 - A1, 2) + pow(C2 - A2, 2));//C point와 A point사이의 거리 변수
+
+		 //cout << endl << S1 << endl << S2 << endl << S3;//각 선분의 변수 출력 확인용
+		 
+		 cout << endl <<"삼각형의 넓이는: " << area::Tri(S1, S2, S3) << endl;//삼각형의 넓이 출력
+	 }
+	 else if (st == 4) {//사각형인 경우
+		 cout << endl << "사각형의 point좌푯값을 입력하시오" << endl;
+		 cout << "A의 x값: ";
+		 cin >> A1;
+		 cout << "A의 y값: ";
+		 cin >> A2;
+		 cout << endl << "B의 x값: ";
+		 cin >> B1;
+		 cout << "B의 y값: ";
+		 cin >> B2;
+		 cout << endl << "C의 x값: ";
+		 cin >> C1;
+		 cout << "C의 y값: ";
+		 cin >> C2;
+		 cout << endl << "D의 x값: ";
+		 cin >> D1;
+		 cout << "D의 y값: ";
+		 cin >> D2;//좌푯값 등록 완료
+
+		 double s[6];
+		 s[0] = sqrt(pow(A1 - B1, 2) + pow(A2 - B2, 2));//A point와 B point사이의 거리 변수
+		 s[1] = sqrt(pow(B1 - C1, 2) + pow(B2 - C2, 2));//B point와 C point사이의 거리 변수
+		 s[2] = sqrt(pow(C1 - D1, 2) + pow(C2 - D2, 2));//C point와 D point사이의 거리 변수
+		 s[3] = sqrt(pow(D1 - A1, 2) + pow(D2 - A2, 2));//D point와 A point사이의 거리 변수
+		 s[4] = sqrt(pow(A1 - C1, 2) + pow(A2 - C2, 2));//A point와 C point사이의 거리 변수
+		 s[5] = sqrt(pow(B1 - D1, 2) + pow(B2 - D2, 2));//B point와 D point사이의 거리 변수
+
+		 double tmp; //사각형 point간의 거리 정렬 변수
+		 for (int i = 5; i > 0; i--) {//버블정렬 사용(단순&비효율)-코드 읽기 편함
+			 for (int j = 0; j < i; j++) {
+				 if (s[j] > s[j + 1]) {
+					 tmp = s[j];
+					 s[j] = s[j + 1];
+					 s[j + 1] = tmp;
+				 }
+			 }
+		  }//s[0]<=s[1]<=s[2]<=s[3]<=s[4]<=s[5]정렬 완료
+		 /*for (int i = 0; i <= 5; i++) {
+			 cout << s[i] << endl;//각 선분의 변수 출력 확인용
+		 }*/
+		 cout << endl << "사각형의 넓이는: " << area::Squ(s[0], s[1], s[2], s[3], s[4], s[5]) << endl;//삼각형의 넓이 출력
+	 }
+	 else {
+		 cout << "삼각형과 사각형이 아닙니다.";
+	 }
+	return 0;
+}

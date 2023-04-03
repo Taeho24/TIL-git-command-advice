@@ -1,0 +1,41 @@
+#include <iostream>
+#include <cmath> // ceil();, floor();, round(); / 올림, 내림, 반올림 함수를 사용하기 위한 헤더파일
+
+/*5개의 숫자를 입력 받아 다음 수식을 수행 후 결과를 출력하시오
+Mean, Sum, Min, Max
+
+반복문, 조건문 사용할 것
+소수점은 소수점 첫째자리까지 반올림하여 출력
+출력 예시
+입력 받은 수 : 3,5,7,9,10
+Mean : 6.8, Sum : 34, Min : 3, Max : 10*/
+
+using namespace std;
+
+ int main() {
+	 float num[5];
+
+	 cout << "Mean, Sum, Min, Max 의 수식을 수행하는 프로그램입니다.\n숫자 5개를 입력하세요.\n" << endl;
+	 cout << "수식을 수행할 숫자 5개: ";
+	 for (int i = 0; i < 5; i++) {
+		 cin >> num[i];
+	 }//숫자 5개 입력
+
+	 float Min = num[0];
+	 float Max = num[0];
+	 float Sum = num[0];
+	 float Mean = num[0];//가장 처음 입력한 수로 초기화
+	for (int n = 1; n < 5; n++) {
+		if (Min >= num[n]) {//Min의 값과 비교하여 갱신
+			Min = num[n];
+		}
+		else if (Max <= num[n]) {
+			Max = num[n];
+		}
+		Sum += num[n];
+	}
+	Mean = Sum / 5;//평균값 = (모든 합: Sum) / 5
+ 
+	cout << endl << "Mean : " << round(Mean * 10) / 10 << "\nSum : " << Sum << "\nMin : " << Min << "\nMax : " << Max << endl;
+	//Mean*10으로 구하고자 하는 소수 첫 째자리까지 올려 계산 후 10을 나누어 원위치
+ }
