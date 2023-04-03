@@ -24,3 +24,12 @@ git remote add origin [깃헙주소]
 git init (Master branch .git 저장소 생성)
 git branch -M main (Master branch를 Main branch로 변경)
 git push origin main 
+
+git chechout [branch이름]
+git switch [branch이름]
+// branch간 이동 명령어
+git branch // 현재 branch 목록
+
+git reest HEAD~2
+
+https://git-school.github.io/visualizing-git/
