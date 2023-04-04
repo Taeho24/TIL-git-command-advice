@@ -19,26 +19,32 @@ commit 메시지 에 연동
 
 마크다운 문법공부!
 
-git remote add origin [깃헙주소]
+`git remote add origin [깃헙주소]`
 - [깃헙주소]를 origin 이라는 명칭으로 즐겨찾기생성
-git init (Master branch .git 저장소 생성)
-git branch -M main (Master branch를 Main branch로 변경)
-git push origin main 
+`git init` (Master branch .git 저장소 생성)
+`git branch -M main` (Master branch를 Main branch로 변경)
+`git push origin main `
 
-git chechout [branch이름]
-git switch [branch이름]
+`git chechout [branch이름]`
+`git switch [branch이름]`
 // branch간 이동 명령어
-git branch // 현재 branch 목록
+`git branch` // 현재 branch 목록
 
-git reset HEAD~2
+`git reset HEAD~2`// 커밋 2줄 삭제
 
-git reset
-git push -f
+`git reset^` // 이전 커밋 상황으로 돌아가기
+`git push -f`
 //commit 기록 삭제
 
 https://git-school.github.io/visualizing-git/
 //가상 merge grape 시각화 사이트
 
-git merge --abort
+`git merge --abort`
 //merge 충돌 해결
-git status 나 검색에 해결상황 검색
+`git status` or 검색에 해결상황 검색
+
+`git pull origin main`
+== `git fetch origin main` + `git merge origin/main`임시 저장할 때 쓰는 명령어
+
+`git stash`
+`git stash pop` // 임시저장 내용 불러오기
