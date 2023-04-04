@@ -34,5 +34,11 @@ git reset HEAD~2
 
 git reset
 git push -f
+//commit 기록 삭제
 
 https://git-school.github.io/visualizing-git/
+//가상 merge grape 시각화 사이트
+
+git merge --abort
+//merge 충돌 해결
+git status 나 검색에 해결상황 검색
