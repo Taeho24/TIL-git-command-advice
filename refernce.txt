@@ -84,6 +84,15 @@ commit 메시지 에 연동
 `git branch -M main` (Master branch를 Main branch로 변경)
 `git push origin main `
 
+# 2024-03-21
+//default brnach가 master이름일때 main으로 바꾸는법
+git branch -m master main
+git fetch origin
+git branch -u origin/main main
+git remote set-head origin -a
+//git hub 참조 명령문
+
+
 `git chechout [branch이름]`
 `git switch [branch이름]`
 // branch간 이동 명령어
