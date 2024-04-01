@@ -88,7 +88,7 @@ commit 메시지 에 연동
 //default branch가 master이름일때 main으로 바꾸는법
 git branch -m master main
 git fetch origin
-git branch -u origin/main main
+git push -u origin/main main
 git remote set-head origin -a
 //git hub 참조 명령문
 
