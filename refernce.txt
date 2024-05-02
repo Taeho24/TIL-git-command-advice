@@ -117,5 +117,7 @@ https://git-school.github.io/visualizing-git/
 == `git fetch origin main` + `git merge origin/main`임시 저장할 때 쓰는 명령어
 
 `git stash`
-`git stash pop` // 임시저장 내용 불러오기
+`git stash apply` // 최근 임시저장 내용 적용(삭제X)
+`git stash drop` // 최근 임시저장 내용 삭제
+`git stash pop` // 임시저장 내용 불러오기(apply + drop)
 
