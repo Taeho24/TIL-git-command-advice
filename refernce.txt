@@ -98,6 +98,10 @@ git branch -u origin/main main  (or)  git push --set-upstream origin main
 git remote set-head origin -a
 //git hub 참조 명령문
 
+// 원격 브랜치 연결하기
+`git remote update`
+`git checkout -t origin/[branch name]`
+
 
 `git chechout [branch이름]`
 `git switch [branch이름]`
@@ -116,6 +120,10 @@ https://git-school.github.io/visualizing-git/
 `git merge --abort`
 //merge 충돌 해결
 `git status` or 검색에 해결상황 검색
+
+// log 확인(커밋 확인)
+`git log` // push commit를 주로 확인
+`git reflog` // local log를 포함하여 확인
 
 `git pull origin main`
 == `git fetch origin main` + `git merge origin/main`임시 저장할 때 쓰는 명령어
