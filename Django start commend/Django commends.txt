@@ -1,0 +1,36 @@
+## install Django
+
+- Django : 파이썬 기반의 오픈 소스 웹 어플리케이션 프레임워크
+- https://www.python.org/ -> 최신기반의 파이썬 설치 필요
+
+# pip install django
+1. 원하는 위치에 작업공간 폴더생성 후
+2. django 프로젝트 생성
+`python -m django startproject [프로젝트명]`
+
+3.데이터베이스이 기본 테이블을 생성
+`python manage.py migrate`
+
+# 앱 개발하기
+
+1. django app을 설치한다.
+`python manage.py startapp [앱이름]`
+
+2. [프로젝트명]/settings.py파일을 열어 다음과 같이 설치한 앱을 설정한다.
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    '[앱이름]' # 설치한 앱의 이름을 추가
+]
+
+**각 모듈간 정의가 안 된 상태로 실행할 경우 생기는 오류 해결
+: ALT+. 이나 ALT+ENTER 시 사용가능한 모듈을 표시해줌** 
+
+
+# 실행하기
+`python manage.py runserver`
