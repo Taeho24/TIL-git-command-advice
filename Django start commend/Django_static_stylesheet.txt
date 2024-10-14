@@ -1,0 +1,73 @@
+# static/css/style.css 적용하기
+## views.py 설정
+
+def index(request):
+    return render(request, 'index.html([html명].html)')
+
+
+## urls.py 설정
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('',views.index([html명])),
+]
+
+
+## settings.py 설정
+
+STATIC_URL = '/static/' // 'static/'보다 '/static/'으로 설정 권장
+
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, '[앱이름]/static'),
+)
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+## .html 파일 설정
+
+{% load static %} 추가
+
+<head>
+ <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+
+
+# css 적용 우선순위
+1. 속성 값으로 !important가 들어간 경우 (가장 우선시 됨)
+```
+#important_style {
+	color: white !important;
+}
+```
+
+2. html 태그에 inline으로 직접 style 속성을 적용하는 경우 (1000점)
+```
+<div style="color: blue;" class="description">inline으로 style속성 지정</div>
+```
+
+3. selector가 #id인 경우 (100점)
+```
+#id_style {
+	color: red;
+}
+```
+
+4. selector가 .class이거나 :pseudo (=가상클래스)인 경우 (10점)
+```
+.class_style {
+	color: black;
+}
+```
+
+5. selector가 tag인 경우 (1점)
+```
+div {
+	color: yellow;
+}
+```
+
+6. 상위 객체의 style속성을 상속받는 경우
+
