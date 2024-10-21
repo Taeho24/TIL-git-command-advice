@@ -48,7 +48,15 @@
 
 ### PUSH
     - commit 만들기
-        - `git commit -m`
+        - `git commit -m "[커밋내용]"` //default
+        - `git commit -m "[커밋 제목]" -m [커밋본문]` // // Description of the detailed information
+            -`git commit -m "[커밋 제목]" -m [커밋본문1] -m [커밋본문2]`
+                ``` // 커밋 표시
+                커밋 제목
+
+                커밋본문1
+                커밋본문2
+                ```
     - 스테이징 영역
     - `git add` 명령어로 커밋에 포함시키고 싶은 파일만 스테이징 영역에 추가
     - `git push` 명령어를 사용하면 로컬 저장소의 브랜치에 있는 커밋들을 원격 저장소에 특정 브랜치로 push해서 동기화 할 수 있다.
@@ -57,7 +65,7 @@
 ### git reset
 - `git reset`을 사용하면 현재 체크아웃한 브랜치의 원하는 과거 커밋으로 HEAD를 이동시키고, 그 이후의 커밋들은 모두 버릴 수 있습니다. 원치 않는 커밋을 되돌릴 때 유용한 명령어 입니다.
 
-- `git commit --amend -m "[commit contents]" git reset 없이 최신 commit 내용을 수정할 수 있습니다.
+- `git commit --amend -m "[commit contents]"` git reset 없이 최신 commit 내용을 수정할 수 있습니다.
 
 
 - [참고자료](https://violet-bora-lee.github.io/git-tutorial/#reset)
