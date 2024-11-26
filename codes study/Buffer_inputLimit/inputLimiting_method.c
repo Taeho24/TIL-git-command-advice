@@ -17,6 +17,7 @@ int main() {
 }
 
 // 2.
+/*
 int main() {
     char name[6];  // 크기 6 (최대 5글자 + 널 문자)
     
@@ -32,8 +33,10 @@ int main() {
     
     return 0;
 }
+*/
 
 // 3.
+/*
 #include <string.h>
 
 int main() {
@@ -55,3 +58,4 @@ int main() {
 
     return 0;
 }
+*/
