@@ -39,6 +39,13 @@
 06. 코드 리뷰를 받는다(선택).
 07. PR(Pull Request)를 마무리한다(Merge).
 
+    Pull Request 수정하기
+    *PR을 Closed 하고 다시 보내기(X)
+    1. Review 받은 내용 수정후 git add 하기
+    2. git commit --amend를 통해 최신 commit 덮어쓰기
+    3. git push -f origin branch-name
+    >> 내가 수정한 부분이 자동으로 PR에 반영(다시 PR 시도 안해도된다.)
+
 ## 로컬 저장소와 원격 저장소 동기화하기
 
 ### fetch
