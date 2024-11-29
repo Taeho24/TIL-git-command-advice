@@ -22,8 +22,8 @@
 01. 브랜치 병합하기
     - `git rebase 병합하고 싶은 브랜치명`
     - `git merge 병합하고 싶은 브랜치명`
-        (git checkout main,
-         git merge [branchname]) -> branchname 의 코드를 main으로 merge
+        EX. (git checkout main,
+             git merge [branchname]) -> branchname 의 코드를 main으로 merge "[branchname]의 코드를 현재 branch로 끌어다 합치는 흐름"
 
 ## 작업 프로세스
 공동 작업을 할 때는 다음과 같은 프로세스로 진행한다.
