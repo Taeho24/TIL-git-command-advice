@@ -87,6 +87,7 @@
 수동 저장을 더 권장한다
 (잘못된 코드가 같이 저장될 경우도 있어서)
 
+[TIP]:
 auto save기능 적극활용
 lerna
 github cosmos-kit
@@ -153,3 +154,5 @@ https://git-school.github.io/visualizing-git/
 `git stash drop` // 최근 임시저장 내용 삭제
 `git stash pop` // 임시저장 내용 불러오기(apply + drop)
 
+// 특정 branch만 clone 하는 command
+`git clone -b {branch_name} --single-branch {저장소 URL}`
