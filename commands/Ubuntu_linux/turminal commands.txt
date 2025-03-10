@@ -49,8 +49,8 @@ set ts=4
 set shiftwidth=4
 set softtabstop=4
 set autoindent
-smartindent
-bg=dark
-expandtab
-mouse+=a
+set smartindent
+set bg=dark
+set expandtab
+set mouse+=a
 
