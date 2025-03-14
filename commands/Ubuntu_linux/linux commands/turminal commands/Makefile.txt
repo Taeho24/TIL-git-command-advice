@@ -1,0 +1,41 @@
+//Make <설정 명령어> like 단축키(alias)
+
+For example, if one project's source files
+
+- ccountln.h, ccountln.c
+- fileops.h, fileops.c
+- process.h, process.c
+- parser.h, parser.c
+
+main 함수는 8개의 파일 중 하나
+
+# one by one:
+- ~$ gcc -g- Wall -c ccountln.c
+- ~$ gcc -g- Wall -c parser.c
+- ~$ gcc -g- Wall -c fileops.c
+- ~$ gcc -g- Wall -c process.c
+and
+- ~$ gcc ccountln.o parser.o fileops.o process.o -o ccountln
+
+or Use one command
+- ~$ gcc -g -Wall ccountln.c parser.c fileops.c process.c -o ccountln
+
+
+# Makefile
+-------------------------------------------------------
+# Simple Makefile with use of gcc could look like this
+CC=gcc
+CFLAGS=-g -Wall
+OBJ=ccountln.o parser.o fileops.o process.o
+EXE=ccountln
+
+all: $(EXE)
+
+$(EXE): $(OBJ)
+    $(CC) $(OBJ) -o $(EXE)
+
+Ccountln.o: ccountln.h ccountln.c
+    $(CC) $(CFLAGS) -c ccountln.c
+
+...
+-------------------------------------------------------
