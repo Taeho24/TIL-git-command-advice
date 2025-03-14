@@ -15,7 +15,7 @@
 
 ## complie and assemble
 ~$ gcc -c test.c // test.o // 오브젝트코드 // linking작업 X
-~$ objdump -S test.o
+~$ objdump -S test.o // 오브젝트코드 내용 확인
 
 ## resulting file into the filename specified instead of the default one
 ~$ gcc -o test.c <filename> // <filename>.out
@@ -41,6 +41,7 @@
 
 
 ## Search the library named library when linking: -l
+~$ (-lc) gcc (-O0) test.c //생략된 명령어를 실행한 것 이라는 뜻
 
 ## Add directory to the list of directories to be searhed for -I : -L
 ex. gcc -I -I ... // -I: header file(.h)의 위치를 알려주는 옵션 // -Ihead.h // #include "head.h" 
