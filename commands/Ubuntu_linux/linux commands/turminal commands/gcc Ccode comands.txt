@@ -21,8 +21,8 @@
 ~$ gcc -o test.c <filename> // <filename>.out
 
 ## Include debugging smbols // gdb
-~$ gcc -g test.c // 실행파일 생성후 gdb이용 debug
-~$ gcc -Og test.c // 디버깅 정보를 담는 옵션
+~$ gcc -g test.c // 디버깅 정보를 담는 옵션 // 실행파일 생성후 gdb이용 debug
+~$ gcc -Og test.c // 디버깅을 위한 최적화 옵션
 
 ~$ gcc -o test-w-g -g test.c // with -g option // Debugging Information
 ~$ gcc -o test-wo-g  test.c // without -g option // No debugging Information
