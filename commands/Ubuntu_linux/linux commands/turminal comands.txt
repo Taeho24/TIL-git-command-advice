@@ -1,0 +1,46 @@
+# c code complier install
+
+~$ sudo apt install gcc
+
+~$ gcc -- version // 버전확인
+
+~$ gcc test.c // a.out test.c test.o test.s
+
+~$ ./a.out //실행
+
+# Options
+
+## complie only
+~$ gcc -S test.c // test.s // 어셈블리코드
+
+## complie and assemble
+~$ gcc -c test.c // test.o // 오브젝트코드 // linking작업 X
+~$ objdump -S test.o
+
+## resulting file into the filename specified instead of the default one
+~$ gcc -o test.c <filename> // <filename>.out
+
+## Include debugging smbols // gdb
+~$ gcc -g test.c // 실행파일 생성후 gdb이용 debug
+~$ gcc -Og test.c // 디버깅 정보를 담는 옵션
+
+~$ gcc -o test-w-g -g test.c // with -g option
+~$ gcc -o test-wo-g -g test.c // without -g option
+
+~$ objdump -g test-w-g // No debugging Information
+~$ objdump -g test-wo-g // Debugging Information
+
+## Show all (most) warnings
+~$ gcc test.c -Wall // 초기화하지 않은 변수값 Warning Message
+
+## Optimizations
+
+-O0 // "no optimization" default option
+-O1 ~ -O3 // various degrees of optimizatioin targeted for speed
+-Os // targets generated code size // 코드의 사이즈를 최적화시켜 크기를 줄이는 옵션(*-O2의 기능을 포함) 
+
+
+## Search the library named library when linking: -l
+
+## Add directory to the list of directories to be searhed for -I : -L
+ex. gcc -I -I ... // -I: header file(.h)의 위치를 알려주는 옵션 // -Ihead.h // #include "head.h" 
