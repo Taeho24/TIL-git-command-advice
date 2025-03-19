@@ -15,6 +15,7 @@ set ts=4    " set tabstop=4
         " softtabstop은 이제 editor 내에서 직접 type한 tab에 대해서 적용
 set expandtab    " tab을 누를 때 알아서 space로 치환
 set ignorecase    " 검색 시 대소문자 무시
+set smartcase   " 검색시 대소문자 구별
 set incsearch   " 키워드를 입력할 때마다 검색하는 점진검색 사용
 set hlsearch    " 검색 시 하이라이트
 set nocompatible    " 방향키로 이동 가능
@@ -57,3 +58,4 @@ set hlsearch
 set ignorecase
 set title
 set paste
+set incsearch
