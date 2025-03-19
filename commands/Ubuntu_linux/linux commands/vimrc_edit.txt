@@ -35,3 +35,25 @@ set textwidth=79    " 79번째 글자를 넘어가면 다음행으로
 set nowrap  "자동 줄바꿈 사용하지 않음
 set wrap    "자동 줄바꿈
 set showmode   "삽입, 명령, 블럭모드 등의 현재모드 표시
+set paste   "붙여넣기 계단현상완화
+
+# simple post
+set number
+set ts=4
+set shiftwidth=4
+set softtabstop=4
+set autoindent
+set smartindent
+set bg=dark
+set expandtab
+set mouse+=a
+set showmatch
+set bs=indent,eol,start
+set wmnu
+syntax on
+set cindent
+set nocompatible
+set hlsearch
+set ignorecase
+set title
+set paste
