@@ -15,13 +15,15 @@ set ts=4    " set tabstop=4
         " softtabstop은 이제 editor 내에서 직접 type한 tab에 대해서 적용
 set expandtab    " tab을 누를 때 알아서 space로 치환
 set ignorecase    " 검색 시 대소문자 무시
+set incsearch   " 키워드를 입력할 때마다 검색하는 점진검색 사용
 set hlsearch    " 검색 시 하이라이트
 set nocompatible    " 방향키로 이동 가능
 set fileencodings=utf-8,euc-kr    " 파일 저장 인코딩 : utf-8, euc-kr
 set fencs=ucs-bom,utf-8,euc-kr    " 한글 파일은 euc-kr, 유니코드는 유니코드
 set bs=indent,eol,start    " backspace 사용가능
+    "backspace=indent,eol,start 들여쓰기,줄의 끝/시작에서 Backspace시 이전 줄과 연결
 set ruler    " 상태 표시줄에 커서 위치 표시
-set title    " 제목 표시
+set title    " 제목 표시줄에 파일명 표시
 set showmatch    " 다른 코딩 프로그램처럼 매칭되는 괄호 보여줌
 set wmnu    " tab 을 눌렀을 때 자동완성 가능한 목록
 syntax on    " 문법 하이라이트 on
@@ -29,3 +31,7 @@ filetype indent on    " 파일 종류에 따른 구문 강조
 set bg=dark    " 배경 색 dark
 set mouse+=a    " 기존 마우스이동의 설정을 유지하면서 모든 모드의 커서 이동을 마우스로 가능하도록
 set textwidth=79    " 79번째 글자를 넘어가면 다음행으로
+set nowrap  "자동 줄바꿈 사용하지 않음
+set wrap    "자동 줄바꿈
+set show mode   "삽입, 명령, 블럭모드 등의 현재모드 표시
+
