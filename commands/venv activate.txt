@@ -1,0 +1,14 @@
+# 파이썬 개발환경 설정
+~$ sudo apt update
+~$ sudo apt install python3-dev pthon3-pip python3-venv
+
+# 가상환경 실행
+~$ python -m venv --system-site-packages ~/venv
+
+Windows :
+1. python -m venv [가상환경이름]
+2. source [가상환경이름]\Scripts\activate
+
+macOS / Linux :
+1. python3 -m venv [가상환경이름]
+2. source [가상환경이름]/bin/activate
