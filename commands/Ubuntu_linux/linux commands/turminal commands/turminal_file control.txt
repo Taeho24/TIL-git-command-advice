@@ -19,6 +19,8 @@
 # 목록 확인
 ~$ ls // option: (-a)/(-l) // ex. ~$ ls -l run
 
+~$ ls -i // inode 출력
+
 ~$ ls *.txt // ~$ ls | grep txt
 
 ~$ ls *zzz > zzz_file > error.msg // ~$ ls // zzz_file error.msg
@@ -95,7 +97,8 @@ Ctrl+d // 쓰기 종료
 # 파일 소유, 권한 변경
 ~$ chown 사용자명:그룹명 ./[파일이름] // 소유 변경
 
-~$ chmod 권한(8진수) ./[파일이름] // 소유자, 그룹, 제3자 순서
+~$ chmod 권한(8진수) ./[파일이름] // 소유자(user), 그룹(group), 제3자(other,world) 순서
+~$ chmod 741 // -d rwxr-x--x
 
 # 프로세스 명령어
 ## 현재 실행 중인 프로세스의 정보 출력
