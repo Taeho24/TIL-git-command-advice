@@ -22,6 +22,9 @@ or Use one command
 
 
 # Makefile
+
+$ sudo apt install make
+
 -------------------------------------------------------
 # Simple Makefile with use of gcc could look like this
 CC=gcc

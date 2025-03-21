@@ -1,0 +1,149 @@
+# 시스템 호출과 라이브러리 함수
+- 리눅스에서 사용하는 일반적인 명령(command)에 대한 설명: 섹션 1
+- 시스템 호출(system call): 섹션 2
+- 라이브러리 함수(library function): 섹션 3
+
+man 페이지의 섹션 번호 : $ man uname // UNAME(1)
+섹션 2의 설명을 보려면? ex. $ man -s 2 uname // UNAME(2) 
+
+
+
+## 시스템 호출의 오류 처리
+- 리눅스는 asm-generic/errno-base.h 파일에 정의되어 있고 유닉스는 sys/errno.h 파일에 정의
+
+# asm-generic/errno-base.h 예시
+1   #define EPERM   1   /*Operation not permitted*/
+2   #define ENOENT  2   /*No such file or directory*/
+3   #define ENOEXEC 12  /*Out of memory*/
+4   #define EBADF   13  /*Permission denied*/
+
+
+
+- errno; 변수는 해당 시스템 호출에서 발생한 오류가 무엇인지 알려줌
+-------------------------------------------------
+01 #include <stdio.h>
+02 #include <unistd.h>
+03 #include <errno.h>
+04
+05 extern int errno;
+06
+07 int main() {
+08  if(access("test.txt", F_OK) == -1) { //access()함수는 접근권환 관련
+09      printf("errno=%d\n", errno);
+10  }
+11 }
+
+
+$ ./ch1_1.out
+errno=2
+-------------------------------------------------
+$ man access 명령으로 access() 함수에서 발생하는 오류코드와 해당 설명을 확인
+
+
+### 오류 메시지 출력 : perror(3)
+-------------------------------------------------
+# include <stdio.h>             [함수 원형]
+
+void perror(const char*s);
+-------------------------------------------------
+01 #include <stdio.h>
+02 #include <unistd.h>
+03 #include <errno.h>
+04 #include <stdlib.h>
+05
+06 int main() {
+07  if(access("test.txt", R_OK) == -1) {
+08      perror("test.txt");
+09      exit(1);
+10  }
+11 }
+
+$ ch1_4.out
+test.txt: No such file or directory
+-------------------------------------------------
+- perror() 함수는 오류 메시지 출력만 하므로 오류의 결과로 프로그램을 종료해야 한다면 exit() 함수를 호출해야 함
+- 오류파일의 이름을 출력한다.
+
+
+### 오류 메시지 출력 : strerror(3)
+-------------------------------------------------
+#include <string.h>             [함수 원형]
+char *strerror(int errnum);
+-------------------------------------------------
+01 #include <stdio.h>
+02 #include <unistd.h>
+03 #include <errno.h>
+04 #include <stdlib.h>
+05 #include <string.h>
+06
+07 extern int errno;
+08
+09 int main() {
+10  char *err;
+11
+12  if(access("test.txt", R_OK) == -1) {
+13      err = strerror(errno);
+14      printf("오류: %s(test.txt)\n", err);
+15      exit(1);
+16  }
+17 }
+
+$ ch1_4.out
+오류: No such file or directory{test.txt}
+-------------------------------------------------
+-  13행에서 리턴한 문자열을 적절한 형태로 가공해 오류 메시지를 출력
+
+- ENOENT: 파일이나 디렉터리가 존재하지 않음 (파일이 없을 때 발생)
+- EACCES: 파일에 대한 접근 권한이 없음 (파일에 접근할 권한이 없을 때 발생)
+
+
+## 시스템 도구
+
+// 포인터의 크기: 8byte // 64-bit운영체제
+
+메모리 할당: malloc(3)
+-------------------------------------------------
+#include <stdlib.h>                 [함수 원형]
+void *malloc(size_t size);
+- size : 할당받을 메모리 크기
+-------------------------------------------------
+char *ptr
+ptr = malloc(sizeof(char) * 100); 
+// 문자(char) 100개 저장할 수 있는 메모리 할당
+-------------------------------------------------
+
+
+메모리 할당: calloc(3)
+-------------------------------------------------
+#include <stdlib.h>                 [함수 원형]
+void *calloc(size_t nmemb, size_t size);
+- nmemb : 배열 요소의 개수
+- size : 할당받을 메모리 크기
+-------------------------------------------------
+char *ptr 
+ptr = calloc(10, 20);
+// 요소가 10개이고 각 요소의 크기가 20바이트인 배열을 저장할 수 있는 메모리를 할당
+-------------------------------------------------
+
+
+메모리 할당: realloc(3)
+-------------------------------------------------
+#include <stdlib.h>                 [함수 원형]
+void *realloc(void *ptr, size_t size);
+- ptr : 할당받은 메모리를 가리키는 포인터
+- size : 할당받을 메모리 크기
+-------------------------------------------------
+char *ptr, *new;
+ptr = malloc(sizeof(char) * 100);
+new = realloc(ptr, 100);
+// malloc() 함수로 할당받은 메모리에 추가로 100바이트를 할당
+-------------------------------------------------
+
+
+메모리 해제 : free(3)
+-------------------------------------------------
+#include <stdlib.h>         [함수 원형]
+void free(void *ptr);
+- ptr : 해제할 메모리 주소
+-------------------------------------------------
+
