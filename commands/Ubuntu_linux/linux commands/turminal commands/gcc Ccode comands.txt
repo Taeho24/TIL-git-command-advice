@@ -29,7 +29,7 @@
 
 
 ## Show all (most) warnings
-~$ gcc test.c -Wall // 초기화하지 않은 변수값 Warning Message
+~$ gcc test.c -Wall // 초기화하지 않은 변수값 Warning Message // warning message가 출력되도 명령어 실행은 가능하다.
 
 ## Optimizations
 
