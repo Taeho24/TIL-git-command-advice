@@ -10,10 +10,10 @@ For example, if one project's source files
 main 함수는 8개의 파일 중 하나
 
 # one by one:
-- ~$ gcc -g- Wall -c ccountln.c
-- ~$ gcc -g- Wall -c parser.c
-- ~$ gcc -g- Wall -c fileops.c
-- ~$ gcc -g- Wall -c process.c
+- ~$ gcc -g -Wall -c ccountln.c
+- ~$ gcc -g -Wall -c parser.c
+- ~$ gcc -g -Wall -c fileops.c
+- ~$ gcc -g -Wall -c process.c
 and
 - ~$ gcc ccountln.o parser.o fileops.o process.o -o ccountln
 
@@ -26,6 +26,7 @@ or Use one command
 $ sudo apt install make
 
 -------------------------------------------------------
+> example 1.
 # Simple Makefile with use of gcc could look like this
 CC=gcc
 CFLAGS=-g -Wall
@@ -42,3 +43,45 @@ Ccountln.o: ccountln.h ccountln.c
 
 ...
 -------------------------------------------------------
+
+---
+> example 2.
+01 # Makefile
+02
+03 CC=gcc
+04 CFLAGS=
+05 OBJS=ch1_3_main.o ch1_3_addnum.o
+06 LIBS=
+07 all : add.out
+08
+09 add.out : $(OBJS)
+10 $(CC) $(CFLAGS) -o add.out $(OBJS) $(LIBS)
+11
+12 ch1_3_main.o : ch1_3_main.c
+13 $(CC) $(CFLAGS) -c ch1_3_main.c
+14 ch1_3_addnum.o : ch1_3_addnum.c
+15 $(CC) $(CFLAGS) -c ch1_3_addnum.c
+16
+17 clean:
+18 rm -f $(OBJS) add.out *.o core
+-------------------------------------------------------
+---
+-------------------------------------------------------
+> 실행 예시
+$ ls
+Makefile ch1_3_addnum.c ch1_3_main.c
+$ make
+gcc -c ch1_3_main.c
+gcc -c ch1_3_addnum.c
+gcc -o add.out ch1_3_main.o ch1_3_addnum.o
+$ ls
+Makefile add.out ch1_3_addnum.c ch1_3_addnum.o ch1_3_main.c ch1_3_main.o
+$ add.out
+Sum 1~5 = 15
+$ make clean
+rm -f ch1_3_main.o ch1_3_addnum.o add.out *.o core
+$ ls
+Makefile ch1_3_addnum.c ch1_3_main.c
+-------------------------------------------------------
+---
+

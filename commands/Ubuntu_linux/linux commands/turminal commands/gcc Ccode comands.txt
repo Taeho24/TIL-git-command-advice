@@ -13,7 +13,7 @@
 ## complie only
 ~$ gcc -S test.c // test.s // 어셈블리코드
 
-## complie and assemble
+## complie and assemble : object_file
 ~$ gcc -c test.c // test.o // 오브젝트코드 // linking작업 X
 ~$ objdump -S test.o // 오브젝트코드 내용 확인
 
