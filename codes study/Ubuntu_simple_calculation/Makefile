@@ -4,7 +4,7 @@ CC=gcc
 CFLAGS=-Wall
 PATCH=func.c
 OBJ=main.o add.o sub.o mul.o div.o
-EXE=calc.out
+EXE=calc
 
 all: $(EXE)
 
