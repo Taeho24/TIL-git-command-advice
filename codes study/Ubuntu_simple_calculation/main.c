@@ -28,7 +28,7 @@ int main() {
     cleaned_input[j] = '\0';  // 문자열 끝에 null 추가
 
      // 수식 파싱 (정수와 연산자만 추출)
-     if (sscanf(cleaned_input, "%d%c%d", &a, &op, &b) != 3) {
+     if (sscanf(cleaned_input, "%d%c%d", &first_num, &op, &second_num) != 3) {
         printf("잘못된 입력입니다. 수식 형식을 확인하세요.\n");
         return 1;
      }
@@ -44,16 +44,16 @@ int main() {
     // 계산 결과
     switch (op) {
         case '+':
-            result = add(a, b);
+            result = add(first_num, second_num);
             break;
         case '-':
-            result = sub(a, b);
+            result = sub(first_num, second_num);
             break;
         case '*':
-            result = mul(a, b);
+            result = mul(first_num, second_num);
             break;
         case '/':
-            result = div(a, b);
+            result = div(first_num, second_num);
             break;
         default:
             printf("Error: Unsupported operator\n");

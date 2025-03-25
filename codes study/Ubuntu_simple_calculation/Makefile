@@ -2,7 +2,7 @@
 
 CC=gcc
 CFLAGS=-Wall
-PATCH=func.c
+PATCH=func.h
 OBJ=main.o add.o sub.o mul.o div.o
 EXE=calc
 
