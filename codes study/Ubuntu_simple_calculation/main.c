@@ -6,7 +6,7 @@
 int main() {
     int first_num = 0, second_num = 0;
     int result = 0;
-    char op = '\0';
+    char op = '\0', extra = '\0';
     char input[100] = {0}; // 입력받은 input
     char cleaned_input[100] = {0}; // 공백을 제거한 input
 
@@ -28,7 +28,7 @@ int main() {
     cleaned_input[j] = '\0';  // 문자열 끝에 null 추가
 
      // 수식 파싱 (정수와 연산자만 추출)
-     if (sscanf(cleaned_input, "%d%c%d", &first_num, &op, &second_num) != 3) {
+     if (sscanf(cleaned_input, "%d%c%d%c", &first_num, &op, &second_num, &extra) != 3) {
         printf("잘못된 입력입니다. 수식 형식을 확인하세요.\n");
         return 1;
      }
