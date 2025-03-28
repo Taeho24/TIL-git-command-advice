@@ -15,6 +15,14 @@
 - 한 개의 Inode 번호는 여러 개의 파일명(하드 링크)과 연결될 수 있음
 - 파일명 자체는 Inode 정보에 저장되지 않고, 디렉터리 엔트리에 따로 저장됨
 
+---
+(1) 파일명이나 디렉ㅌ터리명은 /와 null('\0')문자를 제외하고 아무 문자나 사용 가능
+    단, *(와일드카드), ?(한 글자 와일드 카드), \(이스케이프 문자)는 사용 지양
+(2) 리눅스에서 알파벳은 대소문자를 구분(윈도우는 구분X, 동일 파일로 간주)
+(3) '.'으로 시작하면 숨김파일
+---
+
+
 2.node: 파일의 메타데이터(파일 정보)를 저장하는 구조체
 - Inode는 파일을 식별하는 고유한 번호로 할당되며, 파일 시스템 내에서 동일한 번호를 가진 Inode는 없음
 - Inode에 저장되는 주요 정보
@@ -23,8 +31,9 @@
     - 파일 권한 (읽기, 쓰기, 실행)
     - 생성/수정/접근 시간 (ctime, mtime, atime)
     - 데이터 블록의 위치 정보 (파일의 실제 데이터가 저장된 블록 주소)
-- Inode에는 파일명 정보가 포함되지 않으며, 파일명은 디렉터리에 별도로 저장됨
+- Inode에는 파일명 정보가 포함되지 않으며, 파일명은 디렉터리에 별도로 저장됨(~$ ls -l명령은 inode의 정보를 읽어 출력)
 - ~$ ls -i 명령을 사용하면 파일의 Inode 번호를 확인할 수 있음
+
 
 3.데이터 블록 (Data Block): 파일의 실제 데이터가 저장되는 하드디스크의 공간
 - 데이터 블록은 고정된 크기(일반적으로 4KB 등)로 할당되며, 파일 크기가 크면 여러 개의 데이터 블록에 걸쳐 저장됨
@@ -32,3 +41,100 @@
      직접 블록(Direct blocks(12개x4kb=48kb)), 간접 블록(Single indirect)(4MB==1024x4kB), 이중 간접 블록(Double indirect)(4GB==1024x1024x4kB), 삼중 간접(Triple) 블록을 사용하여 큰 파일도 저장할 수 있음
 - 파일 크기가 작은 경우, 일부 파일 시스템(ext4 등)에서는 Inode 내에 직접 데이터를 저장하는 경우도 있음(Small File Optimization)
 
+---
+
+# 리눅스의 파일종류
+
+~$ file [파일이름]
+
+1. 일반 파일(Regular File)
+
+2. 디렉터리 파일(Directory File)
+
+3. 심볼릭 링크 파일(Symbolic Link)
+
+4. 하드 링크 파일(Hard Link)
+
+5. 특수 파일(Special File)
+- 장치 파일(Device File)과 관련이 있음 (/dev 디렉터리에 위치)
+    (1) 문자 장치 파일(Character Device File)
+        - 문자 단위로 데이터를 입출력하는 장치(ex. 키보드, 마우스, 터미널)
+        - c 기호로 표시
+
+    (2) 블록 장치 파일(Block Device File)
+        - 블록 단위로 데이터를 입출력하는 장치(ex. HDD, SSD, USB)
+        - b 기호로 표시
+        *HDD Seetor: 512Byte
+
+6. FIFO 파일 (Named pipe)
+- 프로세스 간 통신(IPC)을 위해 사용되는 파일
+- p 기호로 표시
+- 일반적으로 한 프로세스가 데이터를 쓰면 다른 프로세스가 이를 읽음
+*ex. ls -l | more : (Unnamed pipe)
+
+~$ mkfifo my_pipe
+~$ ls -l my_pipe // "p"rw-rw-r-- ...
+```
+terminal1 ~$ echo "[message comment]" > my_pipe
+terminal2 ~$ cat < my_pipe
+```
+
+
+7. 소켓 파일(Socket File)
+- 네트워크 통신 및 프로세스 간 통신(IPC)에 사용되는 파일
+- s 기호로 표시
+- 주로 서버-클라이언트 모델에서 사용되는
+
+
+------------------------------------------------------------------------
+
+# 리눅스의 함수
+
+디렉터리 생성
+```
+int mkdir(const char *pathname, mode_t mode);
+```
+
+디렉터리 삭제
+```
+int rmdir(const char *pathname);
+```
+
+현재 위치 확인
+```
+char* getcwd(char *buf, size_t size);
+char* get_current_dir_name(void);
+```
+
+디렉터리명 변경
+```
+int rename(const char *oldpath, const char *newpath);
+```
+
+디렉터리 이동
+```
+int chdir(const char *path);
+int fchdir(int fd);
+```
+
+디렉터리 열기
+```
+DIR *opendir(const char *name);
+```
+
+디렉터리 닫기
+```
+int closedir(DIR *dirp);
+```
+
+디렉터리 내용 읽기
+```
+struct dirent *readdir(DIR *dirp);
+```
+
+디렉터리 오프셋
+```
+long telldir(DIR *dirp);
+void seekdir(DIR *dirp, long loc);
+void rewinddir(DIR *dirp);
+```
