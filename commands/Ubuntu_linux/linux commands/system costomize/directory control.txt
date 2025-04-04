@@ -176,7 +176,7 @@ fd: 이동하려는 디렉터리의 파링 디스크립터
 
 DIR *opendir(const char *name);
 ```
-*perror()함수로 오류 확인 권고
+**perror()함수로 오류 확인 권고**
 
 
 디렉터리 닫기 closedir(3)
