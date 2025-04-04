@@ -384,7 +384,11 @@ resolved_path : 경로명을 저장할 버퍼 주소(절대경로)
 
 int unlink(const char *pathname);
 ```
+
+~$ unlink [경로명]
 ```
+#include <unistd.h>
+
 unlink("linux.ln");
 unlink("linux.sym");
 ```
