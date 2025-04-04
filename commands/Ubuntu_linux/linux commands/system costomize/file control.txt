@@ -321,6 +321,8 @@ mode : 접근 권한
 
 
 ## 하드 링크 생성: link(2)
+~$ ln [원본 파일/디렉토리] [심볼릭 링크]
+
 ```
 #include <unistd.h>                 [함수 원형]
 int link(const char *oldpath, const char *newpath);
@@ -330,6 +332,8 @@ newpath : 새로 생성할 링크의 경로
 
 
 ## 심복릭 링크 생성: symlink(2)
+~$ ln -s [원본 파일/디렉토리] [심볼릭 링크]
+
 ```
 #include <unistd.h>                 [함수 원형]
 int symlink(const char *target, const char *linkpath);
