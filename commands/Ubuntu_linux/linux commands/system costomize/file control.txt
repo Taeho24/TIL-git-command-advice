@@ -1,7 +1,7 @@
-# 리눅스의 함수
+# 파일 정보 검색
 
 
-파일명으로 파일 정보 검색 stat(2):시스템콜
+## 파일명으로 파일 정보 검색 stat(2):시스템콜
 ```
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -18,7 +18,7 @@ statbuf: 검색한 파일 정보를 저장할 구조체 주소
 ---
 
 
-파일 기술자로 파일 정보 검색 stat(2):시스템콜
+## 파일 기술자로 파일 정보 검색 fstat(2):시스템콜
 ```
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -43,24 +43,30 @@ fstat() 함수의 특징
 06 #include <stdio.h>
 07
 08 int main() {
-09 int fd;
-10 struct stat statbuf;
+09  int fd;
+10  struct stat statbuf;
 11
-12 fd = open("linux.txt", O_RDONLY); // O_RDONLY는 지정 상수
-13 if (fd == -1) {
-14 perror("open: linux.txt");
-15 exit(1);
-16 }
+12  fd = open("linux.txt", O_RDONLY); // O_RDONLY는 지정 상수 값
+13  if (fd == -1) {
+14      perror("open: linux.txt");
+15      exit(1);
+16  }
 17
-18 fstat(fd, &statbuf);
+18  fstat(fd, &statbuf);
 19
-20 printf("Inode = %d\n", (int)statbuf.st_ino);
-21 printf("UID = %d\n", (int)statbuf.st_uid);
-22 close(fd);
+20  printf("Inode = %d\n", (int)statbuf.st_ino);
+21  printf("UID = %d\n", (int)statbuf.st_uid);
+22  close(fd);
 23 }
 ```
+Inode = 142534
+UID = 1000
 
 ---
+
+
+# 파일 접근 권한 제어
+
 
 ## stat 구조체
 ```
@@ -123,6 +129,7 @@ long tv_nsec;           /* 나노초(nanoseconds) */
 
 ---
 
+
 ## 특수 접근 권한
 
 - SetUID(Set User ID)
@@ -155,4 +162,229 @@ st_mode(16비트)
 
 ---
 
-## 링크함수 : 하드링크 & 심벌릭 링크
+## 상수를 이용해 파일 종류 검색하기
+```
+01 #include <sys/types.h>
+02 #include <sys/stat.h>
+03 #include <stdio.h>
+04
+05 int main() {
+06  struct stat statbuf;
+07  int kind;
+08
+09  stat("linux.txt", &statbuf);
+10
+11  printf("Mode = %o\n", (unsigned int)statbuf.st_mode);
+12
+13  kind = statbuf.st_mode & S_IFMT; // 번거로운 부분
+14  printf("Kind = %o\n", kind);
+15
+16  switch (kind) {
+17      case S_IFLNK:
+18          printf("linux.txt: Symbolic Link\n");
+19          break;
+20      case S_IFDIR:
+21          printf("linux.txt: Directory\n");
+22          break;
+23      case S_IFREG:
+24          printf("linux.txt: Regular File\n");
+25          break;
+26  }
+27 }
+```
+Mode = 100664
+Kind = 100000
+linux.txt: Regular File
+---
+
+## 매크로를 이용한 파일 종류 검색
+```
+05 int main() {
+06  struct stat statbuf;
+07  int kind;
+08
+09  stat("linux.txt", &statbuf);
+10
+11  printf("Mode = %o\n", (unsigned int)statbuf.st_mode);
+12
+13  if(S_ISLNK(statbuf.st_mode))
+14      printf("linux.txt : Symbolic Link\n");
+15  if(S_ISDIR(statbuf.st_mode))
+16      printf("linux.txt : Directory\n");
+17  if(S_ISREG(statbuf.st_mode))
+18      printf("linux.txt : Regualr File\n");
+19 }
+```
+
+## 상수를 이용한 파일 접근 권한 검색
+- st_mode의 값을 왼쪽으로 3비트 이동시키거나 상숫값을 오른쪽으로 3비트 이동시킨 후 AND 연산을 수행하면 그룹의 접근 권한을 알 수 있음
+```
+st_mode & (S_IREAD >> 3)
+```
+```
+01 #include <sys/types.h>
+02 #include <sys/stat.h>
+03 #include <stdio.h>
+04
+05 int main() {
+06 struct stat statbuf;
+07
+08 stat("linux.txt", &statbuf);
+09 printf("Mode = %o\n", (unsigned int)statbuf.st_mode);
+10
+11 if ((statbuf.st_mode & S_IREAD) != 0)
+12 printf("linux.txt: User has a read permission\n");
+13
+14 if ((statbuf.st_mode & (S_IREAD >> 3)) != 0)
+15 printf("linux.txt: Group has a read permission\n");
+16
+17 if ((statbuf.st_mode & S_IROTH) != 0) // ((statbuf.st_mode & (S_IREAD >> 6)) != 0)
+18 printf("linux.txt: Other have a read permission\n");
+19 }
+```
+S_IRWXU: 소유자에게 읽기/쓰기/실행 권한
+
+user: USR
+group: GRP
+other: OTH
+
+--- 
+
+## 함수를 이용한 접근 권한 검색 : access(2)
+```
+#include <unistd.h>             [함수 원형]
+int access(const char *pathname, int mode);
+```
+pathname : 접근 권한을 알고자 하는 파일의 경로
+mode : 접근 권한
+    R_OK : 읽기 권한 확인
+    W_OK : 쓰기 권한 확인
+    X_OK : 실행 권한 확인
+    F_OK : 파일이 존재하는지 확인
+
+
+## 파일명으로 접근 권한 변경 : chmod(2)
+```
+#include <sys/stat.h>           [함수 원형]
+int chmod(const char *pathname, mode_t mode)
+```
+```
+01 #include <sys/types.h>
+02 #include <sys/stat.h>
+03 #include <stdio.h>
+04
+05 int main() {
+06  struct stat statbuf;
+07
+08  chmod("linux.txt", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH); // 754
+09
+10  stat("linux.txt", &statbuf);
+11  printf("1.Mode = %o\n", (unsigned int)statbuf.st_mode);
+12
+13  statbuf.st_mode |= S_IWGRP; // 774 // 기존 접근 권한 변경 조정
+14  statbuf.st_mode &= ~(S_IROTH); // 770 // 접근 권한 제거(NOT 연산 후 AND 연산 실행)
+15
+16  chmod("linux.txt", statbuf.st_mode); // mode 값을 변경한 후 chmod() 함수를 호출해야 변경된 접근 권한이 적용
+17
+18  stat("linux.txt", &statbuf);
+19  printf("2.Mode = %o\n", (unsigned int)statbuf.st_mode);
+20 }
+
+```
+
+## 파일 기술자로 접근 권한 변경 : fchmod(2)
+```
+#include <sys/stat.h>       [함수 원형]
+int fchmod(int fd, mode_t mode);
+```
+fd : 열려 있는 파일의 파일 기술자
+mode : 접근 권한
+
+---
+
+
+# 링크함수 : 하드링크 & 심벌릭 링크
+
+링크:
+- 이미 있는 파일이나 디렉터리에 접근할 수 있는 새로운 이름을 의미
+- 같은 파일이나 디렉터리지만 여러 이름으로 접근할 수 있게 하는 것
+- 링크 기능을 이용하면 사용자 편의성을 높일 수 있음
+    - ex. 이전 시스템과의 호환성을 유지, 경로가 복잡한 파일에 간단한 경로를 제공
+
+하드 링크(hard link)
+- 파일에 접근할 수 있는 파일명을 새로 생성하는 것으로, "기존 파일과 동일한 inode를 사용"
+- 하드 링크를 생성하면 inode에 저장된 링크 개수가 증가
+
+심벌릭 링크(symbolic link)
+- 기존 파일에 접근할 수 있는 다른 파일을 만듬
+- "기존 파일과 다른 inode를 사용"하며, 기존 파일의 경로를 저장
+
+
+## 하드 링크 생성: link(2)
+```
+#include <unistd.h>                 [함수 원형]
+int link(const char *oldpath, const char *newpath);
+```
+oldpath : 기존 파일의 경로
+newpath : 새로 생성할 링크의 경로
+
+
+## 심복릭 링크 생성: symlink(2)
+```
+#include <unistd.h>                 [함수 원형]
+int symlink(const char *target, const char *linkpath);
+```
+target : 기존 파일의 경로
+linkpath : 새로 생성할 심벌릭 링크의 경로
+
+
+## 심벌릭 링크의 정보 검색: lstat(2)
+
+- lstat() 함수는 심벌릭 링크 자체의 파일 정보를 검색
+- 심벌릭 링크를 stat() 함수로 검색 하면 원본 파일에 대한 정보가 검색된다는 점에 주의
+
+```
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int lstat(const char *pathname, struct stat *statbuf);
+```
+pathname : 심벌릭 링크의 경로
+statbuf : 새로 생성할 링크의 경로
+
+
+## 심벌릭 링크의 내용(경로명) 읽기: readlink(2)
+```
+#include <unistd.h>
+
+ssize_t readlink(const char *pathname, char *buf, size_t bufsiz);
+```
+pathname : 심벌릭 링크의 경로
+buf : 읽어온 내용을 저장할 버퍼
+bufsiz : 버퍼의 크기
+
+
+## 심벌릭 링크 원본 파일의 결로 읽기: realpath(3): 라이브러리 함수
+```
+#include <limits.h>
+#include <stdlib.h>
+
+char *realpath(const char *path, char *resolved_path);
+```
+path : 심벌릭 링크의 경로명
+resolved_path : 경로명을 저장할 버퍼 주소(절대경로)
+
+
+## 링크 끊기: unlink(2)
+- unlink() 함수에서 연결을 끊은 경로명이 그 파일을 참조하는 마지막 링크라면 파일은 삭제
+- 만약 인자로 지정한 경로명이 심벌릭 링크이면 링크가 가리키는 원본 파일이 아니라 심벌릭 링크 파일이 삭제
+```
+#include <unistd.h>
+
+int unlink(const char *pathname);
+```
+```
+unlink("linux.ln");
+unlink("linux.sym");
+```
