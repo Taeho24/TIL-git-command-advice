@@ -74,7 +74,8 @@
 
 ~$ mkfifo my_pipe
 ~$ ls -l my_pipe // "p"rw-rw-r-- ...
-```
+
+```서로 다른 터미널의 통신
 terminal1 ~$ echo "[message comment]" > my_pipe
 terminal2 ~$ cat < my_pipe
 ```
