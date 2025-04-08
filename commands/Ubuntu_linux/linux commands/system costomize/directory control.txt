@@ -116,7 +116,7 @@ int rmdir(const char *pathname);
 
 현재 위치 확인 getcwd(3), get_current_dir_name(3):라이브러리
 ```
-#include <sys/types.h>
+#include <unistd.h>
 
 char* getcwd(char *buf, size_t size);
 ```
