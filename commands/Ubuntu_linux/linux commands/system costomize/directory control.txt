@@ -230,3 +230,16 @@ void rewinddir(DIR *dirp);          // opendir()로 연 디렉터리 스트림�
 ```
 dirp: opendir()로 열린 디렉터리 스트림
 loc: telldir()로 반환 된 위치 값
+
+```
+// 디렉터리 스트림을 처음으로 되돌림
+rewinddir(dp);
+
+// seekdir()을 이용한 위치 이동 테스트
+printf("** Move Directory Pointer **\n");
+readdir(dp); // 한 번 읽기
+loc = telldir(dp); // 현재 위치 저장
+seekdir(dp, loc); // 해당 위치로 이동
+printf("Cur Position : %ld\n", telldir(dp));
+
+```
