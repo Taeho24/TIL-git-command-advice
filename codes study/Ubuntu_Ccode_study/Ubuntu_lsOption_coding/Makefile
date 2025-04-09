@@ -1,21 +1,41 @@
 # Makefile
 
 CC=gcc
-CFLAGS=-Wall
-OBJ=check_empty_dir.o
-#OBJ=custom_ls.o
-#OBJ=file_check.o
-EXE=rmcheck
-#EXE=custls
-#EXE=fcheck
+CFLAGS=-Wall -Wextra
 
-all: $(EXE)
+RM_CHECK_SRC=check_empty_dir.c
+CUST_LS_SRC=custom_ls.c
+FILE_CHECK_SRC=file_check.c
 
-$(EXE): $(OBJ)
-	$(CC) $(CFLAGS) -o $(EXE) $(OBJ)
 
-check_empty_dir.o: check_empty_dir.c
-	gcc -c main.c
+RM_CHECK_OBJ=check_empty_dir.o
+CUST_LS_OBJ=custom_ls.o
+FILE_CHECK_OBJ=file_check.o
+
+EXE1=rmcheck
+EXE2=custls
+EXE3=fcheck
+
+
+all: $(EXE1) $(EXE2) $(EXE3)
+
+$(EXE1): $(RM_CHECK_OBJ)
+	$(CC) $(CFLAGS) -o $(EXE1) $(RM_CHECK_OBJ)
+
+$(EXE2): $(CUST_LS_OBJ)
+	$(CC) $(CFLAGS) -o $(EXE2) $(CUST_LS_OBJ)
+
+$(EXE3): $(FILE_CHECK_OBJ)
+	$(CC) $(CFLAGS) -o $(EXE3) $(FILE_CHECK_OBJ)
+
+$(RM_CHECK_OBJ): $(RM_CHECK_SRC)
+	$(CC) $(CFLAGS) -c $(RM_CHECK_SRC)
+
+$(CUST_LS__OBJ): $(CUST_LS_SRC)
+	$(CC) $(CFLAGS) -c $(CUST_LS_SRC)
+
+$(FILE_CHECK_OBJ): $(FILE_CHECK_SRC)
+	$(CC) $(CFLAGS) -c $(FILE_CHECK_SRC)
 
 clean:
-	rm -f *.o $(EXE)
+	rm -f *.o $(EXE1) $(EXE2) $(EXE3)
