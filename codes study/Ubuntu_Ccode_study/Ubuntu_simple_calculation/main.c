@@ -18,6 +18,9 @@ int main() {
         return 1;
     }
 
+    // 개행 문자 제거
+    input[strcspn(input, "\n")] = '\0';
+
     // 띄어쓰기를 모두 제거하는 코드
     int j = 0;
     for (int i = 0; i < strlen(input); i++) {
