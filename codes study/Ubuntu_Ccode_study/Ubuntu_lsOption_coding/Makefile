@@ -39,3 +39,6 @@ $(FILE_CHECK_OBJ): $(FILE_CHECK_SRC)
 
 clean:
 	rm -f *.o $(EXE1) $(EXE2) $(EXE3)
+
+# $(all)과 $(clean)의 타겟 충돌 방지
+.PHONY: all clean
