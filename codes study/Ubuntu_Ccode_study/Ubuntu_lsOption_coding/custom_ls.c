@@ -28,12 +28,12 @@ void myls(const char *dir_path) {
     closedir(dir);
 }
 
-void normalize_path(char *path) {
+void normalize_path(char *input_path, char *normalize_path) {
     char *dirs[256] = {0};  // 경로 컴포넌트를 저장할 배열
     int dir_count = 0;
     
     // 경로를 '/' 기준으로 분리하여 컴포넌트별로 저장
-    char *token = strtok(path, "/");
+    char *token = strtok(input_path, "/");
     while (token != NULL) {
         if (strcmp(token, ".") == 0) {
             // '.'은 무시
@@ -58,15 +58,15 @@ void normalize_path(char *path) {
     }
     
     // '/'로 구분하여 최종 경로를 생성
-    path[0] = '\0';  // 초기화
+    normalize_path[0] = '\0';  // 초기화
     for (int i = 0; i < dir_count; i++) {
-        strcat(path, "/");
-        strcat(path, dirs[i]);
+        strcat(normalize_path, "/");
+        strcat(normalize_path, dirs[i]);
     }
 
     // 경로가 빈 문자열일 경우, 루트 디렉터리('/')로 처리
-    if (path[0] == '\0') {
-        strcpy(path, "/");
+    if (input_path[0] == '\0') {
+        strcpy(normalize_path, "/");
     }
 }
 
@@ -106,8 +106,7 @@ int main() {
 
     // 경로 정리:   /home/user/./mydir -> /home/user/mydir
     //              /home/user/../mydir -> /home/mydir
-    normalize_path(absolute_path);
-    // 결과 오류:    /home/user/../mydir -> //mydir
+    normalize_path(dir_path, absolute_path);
 
     printf("디렉터리 '%s'의 내용\n", absolute_path);
 
