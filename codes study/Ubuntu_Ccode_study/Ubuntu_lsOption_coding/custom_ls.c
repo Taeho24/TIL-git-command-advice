@@ -59,14 +59,15 @@ void normalize_path(char *input_path, char *normalize_path) {
     
     // '/'로 구분하여 최종 경로를 생성
     normalize_path[0] = '\0';  // 초기화
-    for (int i = 0; i < dir_count; i++) {
-        strcat(normalize_path, "/");
-        strcat(normalize_path, dirs[i]);
-    }
-
+    
     // 경로가 빈 문자열일 경우, 루트 디렉터리('/')로 처리
     if (input_path[0] == '\0') {
         strcpy(normalize_path, "/");
+    }
+
+    for (int i = 0; i < dir_count; i++) {
+        strcat(normalize_path, "/");
+        strcat(normalize_path, dirs[i]);
     }
 }
 
@@ -104,6 +105,9 @@ int main() {
         strcpy(dir_path, absolute_path);
     }
 
+    // ./와 ../가 포함된 경로도 정상작동
+    // myls(dir_path);
+
     // 경로 정리:   /home/user/./mydir -> /home/user/mydir
     //              /home/user/../mydir -> /home/mydir
     normalize_path(dir_path, absolute_path);
@@ -111,7 +115,7 @@ int main() {
     printf("디렉터리 '%s'의 내용\n", absolute_path);
 
     // 디렉터리의 내용 출력
-    myls(dir_path);
+    myls(absolute_path);
 
     return 0;
 }
