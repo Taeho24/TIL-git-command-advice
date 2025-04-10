@@ -61,7 +61,7 @@ void normalize_path(char *input_path, char *normalize_path) {
     normalize_path[0] = '\0';  // 초기화
     
     // 경로가 빈 문자열일 경우, 루트 디렉터리('/')로 처리
-    if (input_path[0] == '\0') {
+    if (dir_count == 0) {
         strcpy(normalize_path, "/");
     }
 
@@ -101,7 +101,7 @@ int main() {
         // 상대 경로와 결합하여 절대 경로 생성
         strcat(absolute_path, dir_path);
 
-        // 절대 경로로 변경
+        // dir_path를 절대 경로로 변경
         strcpy(dir_path, absolute_path);
     }
 
