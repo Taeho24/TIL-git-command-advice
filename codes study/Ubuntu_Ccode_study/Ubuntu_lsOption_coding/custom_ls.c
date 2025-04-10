@@ -106,9 +106,10 @@ int main() {
 
     // 경로 정리:   /home/user/./mydir -> /home/user/mydir
     //              /home/user/../mydir -> /home/mydir
-    normalize_path(dir_path);
+    normalize_path(absolute_path);
+    // 결과 오류:    /home/user/../mydir -> //mydir
 
-    printf("디렉터리 '%s'의 내용\n", dir_path);
+    printf("디렉터리 '%s'의 내용\n", absolute_path);
 
     // 디렉터리의 내용 출력
     myls(dir_path);
