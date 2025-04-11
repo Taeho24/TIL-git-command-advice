@@ -360,6 +360,7 @@ int fclose(FILE *stream);
 ```
 stream : fopen()에서 리턴한 파일 포인터
 
+--- 
 
 ## 문자 기반 입력 함수: fgetc(3), getc(), getchar(), getw(3)
 ```
@@ -397,4 +398,182 @@ stream : 파일 포인터
 - putchar() 함수: 표준 출력으로 한 문자를 출력하는 매크로, putc(c, stdout)와 같음
 - putw() 함수: "워드 단위"로 파일에 출력, 워드의 크기는 int형의 크기로 시스템에 따라 달라짐
 
+--- 
 
+## 문자열 기반 입력 함수: gets(3), fgets(3)
+```
+#include <stdio.h>
+char *gets(const char *s);
+char *fgets(char *s, int size, FILE *stream);
+```
+s : 문자열을 저장한 버퍼의 시작 주소
+size : 버퍼의 크기
+stream : 파일 포인터
+
+gets() 함수의 특징 // 개행문자('\n')를 NULL문자('\0')로 치환
+- 표준 입력에서 문자열을 엔터키를 입력하거나 파일의 끝 을 만날 때까지 읽음
+- 읽어들인 문자열의 끝에서 개행 문자(엔터키 값)를 제외하고 널 문자(‘\0’)를 채워 인자 s가 가리키는 영역에 저장하고 리턴
+- 메모리의 크기를 알 수 없기 때문에 s가 가득 찬 후에도 계속 읽을 수 있음
+    - Buffer Overflow 문제 // 보안 상 위험
+
+fgets() 함수의 특징
+- 파일 포인터가 가리키는 파일에서 변수 size에 지정한 길이보다 하나 적게 문자열을 읽어 s에 저장 // 개행 문자 때문에
+- size의 길이만큼 읽는 도중에 개행 문자를 만나거나 파일의 끝을 만나면 해당 지점까지만 읽어옴
+- gets() 함수와 달리 ""개행 문자도 s에 저장"" 하고, 버퍼의 마지막 문자 다음에 널 문자를 저장
+
+
+## 문자열 기반 출력 함수: puts(3), fputs(3)
+```
+#include <stdio.h>
+int puts(const char *s);
+int fputs(const char *s, FILE *stream);
+```
+s : 문자열 주소
+stream : 파일 포인터
+
+puts() 함수의 특징
+- s가 가리키는 문자열을 표준 출력으로 출력, 이때 "개행 문자(‘\n’)를 추가"해 출력
+
+fputs() 함수의 특징
+- s가 가리키는 문자열을 파일 포인터가 가리키는 파일로 출력
+- 출력할 때 "개행 문자를 추가하지 않음"
+- 두 함수 모두 성공하면 음수가 아닌 수를 리턴하고, 파일의 끝이면 오류를 리턴
+
+--- 
+
+## 버퍼 기반 입력 함수: fread(3)
+```
+#include <stdio.h>
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+```
+ptr : 버퍼 주소
+size : 읽어올 항목 크기
+nmemb : 읽어올 항목 수
+stream : 파일 포인터
+
+
+## 버퍼 기반 출력 함수: fwrite(3)
+```
+#include <stdio.h>
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+```
+ptr : 버퍼 주소
+size : 항목의 크기
+nmemb : 항목 수
+stream : 파일 포인터
+
+- fwrite() 함수는 출력할 때 별도로 개행문자를 추가 하지 않음
+
+
+--- 
+
+## 형식 기반 입출력
+- 형식 기반 입출력 함수의 필요성
+    - 만약 fgets()와 같은 함수를 사용해 파일을 읽어온다고 가정하면 과목별 점수를 구분해 떼어내는 작업을 해야 함
+    - 고수준 파일 입출력은 이처럼 정해진 형식이 있는 파일을 읽을 때 유용하게 사용할 수 있는 형식 기반 입출력 함수를 제공
+
+--- 
+
+## 형식 기반 입력 함수: scanf(3), fscanf(3)
+```
+#include <stdio.h>
+int scanf(const char *format, ...);
+int fscanf(FILE *stream, const char *format, ...);
+```
+format : 입력 형식(%d, %s 등)
+stream : 파일 포인터
+
+- scanf() 함수는 표준 입력에서 입력을 받고, fscanf() 함수는 지정한 파일에서 입력을 받음
+- 성공적으로 수행하면 읽은 항목의 개수를 리턴
+- 입력값이 형식에 맞지 않거나 너무 빨리 파일의 끝에 도달하면 0을 리턴
+- 형식에 맞는지 확인하기 전에 파일의 끝을 만나면 EOF를 리턴
+
+
+## 형식 기반 출력 함수 : printf(3), fprintf(3)
+```
+#include <stdio.h>
+int printf(const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
+```
+stream : 파일 포인터
+format : 출력 형식
+
+- printf() 함수는 표 준 출력으로 출력하고, fprintf() 함수는 지정한 파일로 출력
+- 출력 대상이 파일이기 때문에 첫 번째 인자가 파일 포인터가 된다는 점이 차이점
+- fprintf() 함수도 printf() 함수가 사용하는 형식 지정 방법을 그대로 사용
+- 두 함수 모두 성공적으로 수행하면 출력한 문자 수를, 오류가 발생하면 EOF를 리턴
+
+--- 
+
+
+## 파일 오프셋 이동 : fseek(3)
+```
+#include <stdio.h>
+int fseek(FILE *stream, long offset, int whence);
+```
+stream : 파일 포인터
+offset : 이동할 오프셋
+whence : 오프셋의 기준 위치
+
+- lseek() 함수와 유사하게 동작
+- fseek() 함수는 stream이 가리키는 파일에서 offset에 지정한 크기만큼 오프셋을 이동
+- whence는 offset 값을 해석하는 방법을 결정하는 상수로, lseek() 함수에서와 같은 의미
+
+whence에 사용할 수 있는 값
+- SEEK_SET : 파일의 시작을 기준으로 계산
+- SEEK_CUR : 현재 위치를 기준으로 계산
+- SEEK_END : 파일의 끝을 기준으로 계산
+
+- 성공하면 변경된 오프셋을 리턴하지만 fseek() 함수는 성공하면 0을, 실패하면 EOF를 리턴
+오류예시
+`cur = fseek(fp, 0, SEEK_CUR); (×)`
+
+
+## 현재 오프셋 구하기 : ftell(3)
+```
+#include <stdio.h>
+long ftell(FILE *stream);
+```
+stream : 파일 포인터
+
+-인자로 지정한 파일의 현재 오프셋을 리턴
+- ftell() 함수가 리턴하는 오프셋은 파일의 시작에서 현재 오프셋 위치까지의 바이트 수
+- 수행에 실패하면 EOF를 리턴, 따라서 현재 "오프셋 값을 구하려면 ftell() 함수"를 다음과 같이 사용
+```
+long cur;
+cur = ftell(fp);
+```
+
+
+## 처음 위치로 오프셋 이동 : rewind(3)
+```
+#include <stdio.h>
+void rewind(FILE *stream);
+```
+
+- 오프셋 위치를 파일의 시작으로 즉시 이동
+
+
+## 파일과 디스크 동기화 함수: fflush(3) // 저수준 == fsync(3)
+```
+#include <stdio.h>
+int fflush(FILE *stream);
+```
+
+- 버퍼에 있는 데이터를 파일에 기록
+- 파일을 읽기 전용으로 연 경우 버퍼에 있는 내용을 모두 비움
+- 파일 포인터가 NULL이면 쓰기 전용으로 연 모든 파일에 데이터를 사용
+
+--- 
+
+
+# 파일 기술자와 파일 포인터 변환
+
+
+
+
+--- 
+
+
+# 임시 파일 사용
+## 임시 파일명 생성: tmpnam(3)
