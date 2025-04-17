@@ -26,7 +26,7 @@ void print_file_info(const char *filename) {
     printf("파일명: %s\n", filename);
 
     // inode 번호 출력
-    printf("inode 번호: %ld\n", (int)file_stat.st_ino);
+    printf("inode 번호: %lu\n", (unsigned long)file_stat.st_ino);
 
     // 파일 종류 출력
     if (S_ISREG(file_stat.st_mode)) {
@@ -51,7 +51,7 @@ void print_file_info(const char *filename) {
     printf("접근권한: %o\n", (unsigned int)file_stat.st_mode);
 
     // UID 출력
-    printf("UID: %d\n", (int)file_stat.st_uid);
+    printf("UID: %u\n", (unsigned int)file_stat.st_uid);
 }
 
 int main(int argc, char *argv[]) {
