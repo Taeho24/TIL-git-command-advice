@@ -1,0 +1,340 @@
+# 시스템 정보 검색
+
+## 시스템 정보 검색 함수
+- uname() 함수: 설치된 운영 체제 정보와 같은 시스템 기본 정보를 검색할 수 있음
+- sysconf() 함수: 시스템 자원 정보를 검색할 수 있음
+- fpathconf() 함수와 pathconf() 함수: 파일과 디렉터리 자원 정보를 검색할 수 있음
+
+--- 
+
+## 운영체제 기본 정보 검색
+
+uname 명령
+- 시스템에 설치된 운영체제의 이름과 버전, 호스트명, 하드웨어 종류 등을 검색하려면 uname 명령을 사용
+- uname 명령에 -a 옵션을 지정하면 현재 시스템에 설치되어 있는 운영체제 정보가 출력
+```
+$ uname –a
+
+Linux   jw09    5.8.0-44-generic  #50~20.04.1-Ubuntu SMP Wed Feb 10 21:07:30 UTC 2021
+커널명  호스트명 커널 버전          커널 릴리즈(배포버전)
+x86_64     x86_64      x86_64   GNU/Linux
+하드웨어명  프로세서명  플랫폼명  운영체제명
+```
+
+--- 
+
+## 운영체제 정보 검색: uname(2)
+```
+#include <sys/utsname.h>
+int uname(struct utsname *buf);
+```
+buf : utsname 구조체 주소 (UNIX time-sharing system)
+
+- 운영체제 정보를 검색해 utsname 구조체에 저장
+- utsname 구조체는 sys/utsname.h 파일에 정의되어 있고 man –s 2 uname으로 확인할 수 있음
+```utsname
+struct utsname {
+char sysname[];     // 현재 운영체제의 이름을 저장
+char nodename[];    // 네트워크를 통해 통신할 때 사용하는 시스템의 이름을 저장
+char release[];     // 운영체제의 릴리즈 번호를 저장(커널 정보)
+char version[];     // 운영체제의 버전 번호를 저장(릴리즈-배포버전 정보)
+char machine[];     // 운영체제가 동작하는 하드웨어의 표준 이름(아키텍처)을 저장
+};
+```
+
+--- 
+
+## BSD 계열 유닉스의 호스트명 검색 함수
+```
+#include <unistd.h>
+int gethostname(char *name, size_t len);
+int sethostname(const char *name, size_t len);
+```
+len: name의 길이
+
+- BSD 계열의 유닉스에서는 호스트 이름을 검색하고 설정하기 위한 별도의 함수를 제공
+
+- 이 함수들은 SVR4에도 이식
+- gethostname() 함수: 현재 시스템에 설정된 호스트 이름을 검색하여 name에 저장
+- sethostname() 함수: 새로 설정할 호스트 이름을 name에 지정
+
+--- 
+
+### 솔라리스의 sysinfo() 함수: [중요X]
+```
+#include <sys/systeminfo.h>
+long sysinfo(int command, char *buf, long count);
+```
+- 솔라리스에서는 시스템 정보를 검색하거나 설정할 수 있는 sysinfo( ) 함수를 제공
+
+- sysinfo() 함수: command에 지정한 검색 또는 설정 명령에 따른 값을 buf에 저장
+- 솔라리스와 달리 리눅스에서 sysinfo( ) 함수는 메모리와 프로세스 정보를 검색할 때 사용
+
+--- 
+
+## 시스템 자원 정보 검색 : sysconf(3)
+```
+#include <unistd.h>
+long sysconf(int name);
+```
+name : 검색할 정보를 나타내는 상수
+
+- 검색하려는 시스템 정보를 나타내는 상수를 인자로 받고 현재 설정되어 있는 시스템 자원값 또는 옵션값을 리턴
+- 오류가 발생하면 –1을 리턴
+
+- sysconf() 함수의 인자로 지정할 수 있는 상수는 sys/unistd.h 파일에 정의
+
+상수                설명
+_SC_ARG_MAX         exec() 계열 함수에 사용하는 인자의 최대 크기
+_SC_SHILD_MAX       한 UID에 허용되는 최대 프로세스 개수
+_SC_HOST_NAME_MAX   호스트명의 최대 길이
+_SC_LOGIN_NAME_MAX  로그인명의 최대 길이(byte)
+_SC_CLK_TCK         초당 클록 틱 수
+        // 100tick/s == 10ms // 초당 1틱씩 증가 시킴 
+        // 초당 프로세스 처리량은 늘지만 스케줄링이 속도(10ms)에 한계가 있다.
+        // 1000tick/s로 증가시키면 == 1ms
+        // 초당 respons반응은 늘어나지만 처리량은 낮아진다.
+_SC_OPEN_MAX        프로세스당 열 수 있는 최대 파일 수
+_SC_PAGESIZE        시스템 메모리의 페이지 크기
+_SC_VERSION         시스템이 지원하는 POSIX.1버전
+
+--- 
+
+
+## 파일과 디렉터리 자원 검색 : fpathconf(3)/pathconf(3)
+```
+#include <unistd.h>
+long fpathconf(int fd, int name);
+long pathconf(const char *path, int name);
+```
+fd : 파일 기술자
+path : 파일이나 디렉터리 경로
+name : 검색할 정보를 지정하는 상수
+fpathconf() 함수의 특징
+
+- 열린 파일의 파일 기술자인 fd를 인자로 받아 이 파일과 관련된 자원값이나 옵션값 정보를 검색
+- path에 지정한 파일이나 디렉터리와 관련해 설정된 자원값이나 옵션값을 리턴
+- 이 함수들은 성공하면 결과를 정수로 리턴하고 오류가 발생하면 –1을 리턴
+
+상수            설명
+_PC_LINK_MAX    파일에 가능한 최대 (하드)링크 수
+_PC_NAME_MAX    파일명의 최대 길이를 바이트 크기로 표시
+        //리눅스 기본 파일시스템:ext, 윈도우 기본 파일 시스템: NTFS
+_PC_PATH_MAX    상대 경로명의 최대 길이를 바이트 크기로 표시
+
+--- 
+
+
+# 사용자 정보 검색
+
+
+## 로그인명 검색 : getlogin(3)
+`$ who` // 현재 로그인된 계정의 목록 출력
+
+```
+#include <unistd.h>
+char *getlogin(void);
+```
+(void는 인자로 아무것도 지정하지 않음을 의미) 
+
+- /var/run/utmp 파일을 검색해 현재 프로세스를 실행한 사용자의 로그인 명을 찾아 리턴
+- 만약 이 프로세스를 실행한 사용자가 로그아웃했거나 rsh(remote shell) 등으로 원격에서 실행한 프로세스에서 getlogin() 함수를 호출하면 사용자명을 찾지 못하고 널 포인터를 리턴하므로 주의
+
+--- 
+
+## 백그라운드 프로그램 실행
+`$ nohup <프로세스>`(no hang up) // 로그아웃으로 세션과의 연결이 종료되어도 데몬 형태로 실행되어 종료X
+    // 755 permission 필요
+`$ <프로세스> &` // 백그라운드 실행 // 예전에는 눈이만 안보일 뿐 로그아웃시 종료 >> nohup과 동일하게 종료되지 않는 옵션이 디폴트 적용
+
+--- 
+
+## UID 검색 : getuid(2)/geteuid(2)
+```
+#include <unistd.h>
+#include <sys/types.h>
+
+uid_t getuid(void);
+uid_t geteuid(void);
+```
+fd : 파일 기술자
+path : 파일이나 디렉터리 경로
+name : 검색할 정보를 지정하는 상수
+
+- getuid() 함수는 현재 프로세스의 실제 사용자 ID를, geteuid() 함수는 유효 사용자 ID를 리턴, 두 함수 모두 인자를 받지 않음
+
+- 실제 사용자 ID(RUID) : 로그인할 때 사용한 로그인명에 대응하는 UID로, 프로그램을 실행하는 사용자
+- 유효 사용자 ID(EUID) : 프로세스에 대한 접근 권한을 부여할 때 사용, 처음 로그인할 때는 실제 사용자 ID와 유효 사용자ID가 같지만,
+                     setuid가 설정된 프로그램을 실행하거나 다른 사용자 ID로 변경할 경우 유효 사용자 ID는 달라짐
+
+--- 
+
+## 계정명 만들기
+`$ sudo adduser <계정명>` // 계정생성
+- adduser 로 사용자를 추가하면 여러가지 개인정보, 비밀번호 생성 및 home 디렉토리 생성을 자동으로 진행
+
+`$ sudo usermod <options> <group> <id:계정명>` // 관리자 권한 부여(sudoer 목록에 추가)
+//ex. $ sudo usermod -aG sudo new_user
+
+# 사용자 권한 확인 (사용자 등록 그룹 확인)
+`$ groups <계정명>`
+
+# 비밀번호 변경
+`$ passwd <계정명>`
+
+`$ sudo userdel <option> <id>` // 계정삭제
+//ex. $ sudo userdel -r new_user
+
+
+`$ cat /etc/passwd`
+`$ grep <계정명> /etc/passwd`
+<계정명>:x:1000:1000:<계정명>:/home/<계정명>:/bin/bash
+│        │  │    └GID └계정설명    └ 홈 디렉터리 └로그인 셸
+└로그인ID│  └UID:1001, 1002, ...
+         └패스워드
+
+- user1 사용자가 속한 그룹의 ID는 1001인데 리눅스에서는 사용자 계정을 등록할 때 UID와 같은 값으로 GID를 생성
+- /etc/group 파일을 보면 GID 1001은 user1 그룹
+- user1 사용자에 대한 설명을 보면 ‘sample test’로 샘플 계정임을 알 수 있고, 홈 디렉터리는 /home/user1
+- 로그인 셸은 배시 셸로 지정
+
+--- 
+
+```passwd 구조체
+struct passwd {
+char *pw_name;      // 로그인명을 저장
+char *pw_passwd;    // 암호를 저장, 요즘은 거의 대부분의 리눅스 시스템이 암호를 별도의 파일에 저장하므로 의미 없는 항목(/etc/shadow에 저장)
+uid_t pw_uid;       // UID를 저장
+gid_t pw_gid;       // 기본 그룹 ID를 저장
+char *pw_gecos;     // 사용자 실명이나 기타 정보를 저장
+char *pw_dir;       // 홈 디렉터리를 저장
+char *pw_shell;     // 로그인 셸을 저장
+};
+```
+
+--- 
+
+## /etc/shadow 파일
+- Linux 및 Unix 계열 시스템에서 사용자 비밀번호 관련 정보를 보관하는 고보안 시스템 파일
+- 예전에는 /etc/passwd에 비밀번호 해시까지 들어 있었지만, 보안상의 이유로 현재는 암호 정보를 별도의 파일로 분리해서 /etc/shadow에 저장
+    + hash()값을 찾기위한 레인보우테이블(경우의 수를 다 찾아 놓는것)을 보안하기위해 salt값을 추가
+
+`$ sudo cat /etc/shadow`
+
+--- 
+
+## UID로 /etc/passwd 파일 읽기 : getpwuid(3)
+```
+#include <sys/types.h>
+#include <pwd.h>
+struct passwd *getpwuid(uid_t uid);
+```
+uid : 검색할 UID
+
+- /etc/passwd 파일에서 uid를 찾아 passwd 구조체에 결과를 저장하고 주소를 리턴
+- 만약 uid에 해당하는 사용자를 찾지 못하면 널 포인터를 리턴
+
+--- 
+
+## 이름으로 passwd 파일 읽기 : getpwnam(3)
+```
+#include <sys/types.h>
+#include <pwd.h>
+struct passwd *getpwnam(const char *name);
+```
+name : 로그인명
+
+- 로그인명을 받아 /etc/passwd 파일에서 사용자 정보를 검색한 후 검색 결과를 passwd 구조체에 저장하고 주소를 리턴
+- 만일 로그인명에 해당하는 사용자를 찾지 못하면 널 포인터를 리턴
+
+--- 
+
+## /etc/passwd 파일을 순차적으로 읽기 : getpwent(3), setpwent(3), endpwent(3), fgetpwent(3)
+```
+#include <sys/types.h>
+#include <pwd.h>
+
+struct passwd *getpwent(void);
+void setpwent(void);
+void endpwent(void);
+struct passwd *fgetpwent(FILE *stream);
+```
+stream : 파일 포인터
+
+- getpwent( ) 함수: /etc/passwd 파일에서 사용자 정보를 순차적으로 읽어옴
+- setpwent( ) 함수: /etc/passwd 파일의 오프셋을 파일의 처음에 놓음
+- endpwent( ) 함수: /etc/passwd 파일을 닫음
+- fgetpwent( ) 함수: 파일 포인터를 인자로 받음
+
+--- 
+
+## /etc/shadow 파일의 구조
+`$ cat /etc/shadow`
+root:!:18654:0:99999:7:::
+│    │   │   │   │   │ └계정 만료일:flag(flag는 사용X)
+│    │   │   │   │   └경고기간
+│    │   │   │   └최대 변경일
+│    │   │   └최소 변경일
+│    │   └마지막 변경일
+│    └패스워드
+└로그인ID
+
+
+### /etc/shadow의 암호 필드 옛;
+상태                /etc/shadow의 암호 필드 예시    설명
+정상 암호           $6$abcd...                      - SHA-512 해시된 암호
+비밀번호            빈문자열""                      - 누구나 암호 없이 로그인 가능 (보안상 위험)
+로그인 불가         *또는 !*                        - 어떤 암호로도 로그인 불가 (시스템 계정용)
+잠금된 사용자 계정  !$6$abcd                        - 비밀번호 앞에 ! 추가 → 잠금 상태 (잠금 해제는 `passwd -u`)(잠금의 경우 -l 옵션 사용)
+
+
+--- 
+
+- /etc/shadow 파일은 사용자 패스워드 정보와 패스워드의 주기 정보를 저장
+
+```spwd 구조체
+struct spwd {
+char *sp_namp;          // 로그인명을 저장
+char *sp_pwdp;          // 사용자 계정의 패스워드를 암호화해 저장
+int sp_lstchg;          // 패스워드를 변경한 날짜 정보로, 1970년 1월 1일부터 일 수로 계산해 저장
+int sp_min;             // 변경된 패스워드를 사용해야 하는 최소 일 수
+int sp_max;             // 현재 패스워드를 사용할 수 있는 최대 일 수
+int sp_warn;            // 패스워드를 변경할 날이 되기 전에 경고를 시작하는 일 수
+int sp_inact;           // 패스워드가 만료된 이후 사용자 계정이 정지될 때까지의 일 수
+int sp_expire;          // 사용자 계정이 만료되는 날짜 정보로, 1970년 1월 1일부터 일 수로 표시
+unsigned int sp_flag;   // 나중에 사용하기 위해 예약된 공간으로, 현재는 사용하지 않음
+}
+```
+
+--- 
+
+## /etc/shadow 파일 검색 : getspnam(3)
+```
+#include <shadow.h>
+struct spwd *getspnam(const char *name);
+```
+name : 검색할 사용자명
+
+- 인자로 지정한 사용자의 패스워드 정보를 읽어옴
+
+--- 
+
+## /etc/shadow 파일을 순차적으로 읽기 : getspent(3), setspent(3), endspent(3), fgetspent(3) 
+```
+#include <shadow.h>
+
+struct spwd *getspent(void);
+void setspent(void);
+void endspent(void);
+struct spwd *fgetspent(FILE *stream);
+```
+stream : 파일 포인터
+
+- getspent() 함수: /etc/shadow 파일에서 패스워드 정보를 순차적으로 읽어오며, /etc/ shadow 파일의 끝을 만나면 널(Null) 포인터를 리턴
+- setspent() 함수: /etc/shadow 파일의 오프셋을 파일의 처음으로 위치시킴
+- endspent() 함수: /etc/shadow 파일을 닫음
+- fgetspent() 함수: /etc/shadow 파일이 아닌 파일 포인터로 지정한 다른 파일에서 패스워드 정보를 읽어옴
+
+
+--- 
+
