@@ -44,7 +44,22 @@
 ---
 ## Add directory to the list of directories to be searhed for -I : -L
 ex. gcc -I -I ... // -I: header file(.h)의 위치를 알려주는 옵션 // -Ihead.h // #include "head.h" 
+```-I(헤더 파일 디렉토리 지정)
+$ gcc -I /path/to/headers source.c -o output
+$ gcc -I /home/user/include my_program.c -o my_program
+// /home/user/include 디렉토리에서 #include "my_header.h"를 찾게 됩니다.
+```
+```-L(라이브러리 파일 디렉토리 지정)
+$ gcc -L /path/to/libs -l library_name source.c -o output
+$ gcc -L /home/user/libs -l mylib my_program.c -o my_program
+// /home/user/libs 디렉토리에서 libmylib.so 라이브러리를 찾아서 링크합니다.
+```
 
+1. `-I`는 컴파일러가 헤더 파일을 찾을 디렉토리를 지정하는 것이고, `-L`은 링커가 라이브러리를 찾을 디렉토리를 지정하는 것입니다.
+
+2. `-l` 옵션은 특정 라이브러리 파일을 링커에 전달하는 역할을 하며, `-L`로 지정된 경로에서 해당 라이브러리를 찾습니다.
+
+--- 
 
 ### `-I` 옵션이 필요 없는 이유  
 - "같은 디렉터리"에 있는 경우, `#include "*.h"`를 사용하면 자동으로 찾을 수 있습니다.  
@@ -54,7 +69,7 @@ ex. gcc -I -I ... // -I: header file(.h)의 위치를 알려주는 옵션 // -Ih
 만약 `*.h`가 다른 디렉터리(예: `include/` 폴더)에 있다면, 다음과 같이 `-I` 옵션을 추가해야 합니다:  
 ```makefile
 main.o: main.c
-	gcc -c main.c -Iinclude
+	gcc -c main.c -I include
 ```
 
 그리고 `main.c`에서 헤더를 포함할 때는 이렇게 수정해야 합니다:  
