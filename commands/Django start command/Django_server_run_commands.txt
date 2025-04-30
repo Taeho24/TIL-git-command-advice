@@ -9,6 +9,7 @@
 `python -m django startproject [프로젝트명]`
 
 3.데이터베이스이 기본 테이블을 생성
+`cd [프로젝트명]` // manage.py를 포함하는 directory까지 이동동
 `python manage.py migrate`
 
 # 앱 개발하기
