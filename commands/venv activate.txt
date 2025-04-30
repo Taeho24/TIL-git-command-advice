@@ -12,3 +12,6 @@ Windows :
 macOS / Linux :
 1. python3 -m venv [가상환경이름]
 2. source [가상환경이름]/bin/activate
+
+# 가상환경 실행취소
+~$ deactivate
