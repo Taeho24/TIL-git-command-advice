@@ -11,14 +11,19 @@ print: acegikmoqsuwy */
 
 #define BUF_SIZE 1  // 한 문자씩 읽기 위해 버퍼 크기를 1로 설정
 
-int main() {
+int main(int argc, char *argv[]) {
     // 파일 디스크립터
     int fd = -1;
     char ch = '\0';  // 읽을 문자
     off_t offset = 0;  // 파일의 현재 오프셋
 
+    if (argc != 3) {
+        fprintf(stderr, "사용법: %s <파일명명>\n", argv[0]);
+        return 1;
+    }
+
     // 파일 열기 (읽기 전용)
-    fd = open("data.txt", O_RDONLY);  // 파일 이름은 "data.txt"로 가정
+    fd = open(argv[1], O_RDONLY);  // 파일 이름은 "data.txt"로 가정
     if (fd == -1) {
         perror("파일 열기 실패");
         return 1;
