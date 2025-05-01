@@ -33,9 +33,8 @@ int main(int argc, char *argv[]) {
 
     // 파일 내용 읽기
     while ((bytes_read = read(fd, buffer, BUF_SIZE)) > 0) {
-        dprintf(STDOUT_FILENO, "%d ", line_number++);
         for (ssize_t i = 0; i < bytes_read; i++) {
-            if (buffer[i] == '\n') {
+            if (buffer[i-1] == '\n') {
                 // 줄 번호 출력
                 dprintf(STDOUT_FILENO, "%d ", line_number++);
             }
