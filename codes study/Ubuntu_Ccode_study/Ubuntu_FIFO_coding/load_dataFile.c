@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     char ch = '\0';  // 읽을 문자
     off_t offset = 0;  // 파일의 현재 오프셋
 
-    if (argc != 3) {
+    if (argc != 2) {
         fprintf(stderr, "사용법: %s <파일명명>\n", argv[0]);
         return 1;
     }
