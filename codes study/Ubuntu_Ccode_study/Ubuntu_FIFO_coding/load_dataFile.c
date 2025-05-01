@@ -34,7 +34,7 @@ int main() {
 
         // 홀수 인덱스 문자 출력
         if (offset % 2 == 0) { // (0부터 시작하므로, 실제로는 짝수 위치에 있는 문자)
-            write(STDOUT_FILENO, &ch, 1);
+            write(STDOUT_FILENO, &ch, BUF_SIZE);
         }
 
         // 다음 문자로 이동
