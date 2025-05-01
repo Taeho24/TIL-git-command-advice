@@ -30,16 +30,22 @@ int main(int argc, char *argv[]) {
     }
 
     // 파일에서 문자 읽기
-    while (lseek(fd, offset, SEEK_SET) != -1) {  // 현재 오프셋 위치로 이동
-        if (read(fd, &ch, BUF_SIZE) == -1) {
-            perror("파일 읽기 실패");
+    while (1) {
+        // 현재 위치로 오프셋 이동 (offset 위치로 이동)
+        if (lseek(fd, offset, SEEK_SET) == -1) {
+            perror("lseek 실패");
             close(fd);
             return 1;
         }
 
-        // 홀수 인덱스 문자 출력
-        if (offset % 2 == 0) { // (0부터 시작하므로, 실제로는 짝수 위치에 있는 문자)
-            write(STDOUT_FILENO, &ch, BUF_SIZE);
+        // 문자 읽기
+        if (read(fd, &ch, BUF_SIZE) == 1) {
+            // 홀수 인덱스 문자 출력 (0부터 시작이므로 짝수 인덱스)
+            if (offset % 2 == 0) {
+                write(STDOUT_FILENO, &ch, BUF_SIZE);
+            }
+        } else {
+            break;  // 파일 끝에 도달하면 종료
         }
 
         // 다음 문자로 이동
