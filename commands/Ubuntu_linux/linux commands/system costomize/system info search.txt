@@ -280,7 +280,7 @@ root:!:18654:0:99999:7:::
 └로그인ID
 
 
-### /etc/shadow의 암호 필드 옛;
+### /etc/shadow의 암호 필드 예시
 상태                /etc/shadow의 암호 필드 예시    설명
 정상 암호           $6$abcd...                      - SHA-512 해시된 암호
 비밀번호            빈문자열""                      - 누구나 암호 없이 로그인 가능 (보안상 위험)
@@ -303,7 +303,7 @@ int sp_warn;            // 패스워드를 변경할 날이 되기 전에 경고
 int sp_inact;           // 패스워드가 만료된 이후 사용자 계정이 정지될 때까지의 일 수
 int sp_expire;          // 사용자 계정이 만료되는 날짜 정보로, 1970년 1월 1일부터 일 수로 표시
 unsigned int sp_flag;   // 나중에 사용하기 위해 예약된 공간으로, 현재는 사용하지 않음
-}
+};
 ```
 
 --- 
@@ -337,4 +337,309 @@ stream : 파일 포인터
 
 
 --- 
+
+## 그룹 ID 검색하기 : getgid(2), getegid(2)
+```
+#include <unistd.h>
+#include <sys/types.h>
+gid_t getgid(void);
+gid_t getegid(void);
+```
+stream:: 파일 포인터
+    //git_t 대신 int형도 상관 없음
+
+- 실제 그룹 ID를, getegid() 함수는 유효 그룹 ID를 리턴
+- UID와 마찬 가지로 프로세스와 관련된 GID의 종류도 두 가지
+- 실제 그룹 ID(RGID): 로그인할 때 사용한 사용자 계정의 기본 그룹
+- 유효 그룹 ID(EGID): 프로세스 접근 권한을 부여할 때 사용
+
+--- 
+
+## group 구조체
+$ cat /etc/group
+- /etc/passwd 파일처럼 그룹 정보는 /etc/group 파일에 한 행씩 저장되며, 항목은 콜론(:)으로 구분
+
+```grp.h
+struct group {
+char *gr_name;      // 그룹명
+char *gr_passwd;    // 그룹 패스워드를 저장, 보통은 공백
+gid_t gr_gid;       // 그룹 ID 번호를 저장
+char * *gr_mem;     // 그룹의 멤버인 로그인명을 저장, 문자열을 가리키는 포인터
+};
+```
+
+--- 
+
+## /etc/group 파일 검색 : getgrnam(3), getgrgid(3)
+```
+#include <sys/types.h>
+#include <grp.h>
+struct group *getgrnam(const char *name);
+struct group *getgrgid(gid_t gid);
+```
+name : 검색하려는 그룹명
+gid : 검색하려는 그룹의 ID
+
+--- 
+
+## /etc/group 파일을 순차적으로 읽기 : getgrent(3), setgrent(3), endgrent(3), fgetgrent(3)
+```
+#include <sys/types.h>
+#include <grp.h>
+
+struct group *getgrent(void);   // /etc/group 파일에서 그룹 정보를 순차적으로 읽어옴. /etc/group 파일의 끝을 만나면, 널 포인터를 리턴
+void setgrent(void);    // /etc/group 파일의 오프셋을 파일의 처음으로 위치시킴
+void endgrent(void);    // /etc/group 파일을 닫음
+struct group *fgetgrent(FILE *stream);  // /etc/group 파일이 아닌 파일 포인터로 지정한 다른 파일에서 그룹 정보를 읽어옴
+```
+stream : 파일 포인터
+
+--- 
+
+## 리눅스에서 로그인 정보 검색
+- `$ who` 명령어로 현재 시스템에 로그인한 사용자 정보 검색 가능
+- `$ last` 명령어로는 시스템의 부팅 시각 정보나 사용자 로그인 기록 등을 검색할 수 있음
+
+## 로그인 정보 저장
+- /var/run/utmp     // 현재 로그인 정보
+- /var/log/wtmp     // 접속 종료 정보
+- /var/log/btmp     // 로그인 실패 정보
+
+--- 
+
+## utmp 구조체
+
+```utmp.h
+#struct utmp {
+short ut_type;
+pid_t ut_pid;
+char ut_line[UT_LINESIZE];  // 사용자가 로그인한 장치명
+char ut_id[4];              // 터미널 이름
+char ut_user[UT_NAMESIZE];  // 사용자명을 저장
+char ut_host[UT_HOSTSIZE];
+struct exit_status ut_exit; // 프로세스가 DEAD_PROCESS인 경우 프로세스의 종료 상태를 저장
+long ut_session;            // 해당 정보의 세션 번호
+struct timeval ut_tv;       // 해당 정보를 마지막으로 변경한 시각
+int32_t ut_addr_v6[4];      // 원격 접속한 경우 원격 호스트의 인터넷 주소를 저장
+char __unused[20];          // 추후 사용을 위해 예약해둔 부분
+};
+```
+
+### $man -s 5 utmp
+```ut_exit
+struct exit_status{
+    short e_termination;
+    short e_exit;
+}
+```
+
+
+### t_type
+- 현재 읽어온 항목에 저장된 데이터 형식을 나타냄
+
+이름                상수    의미
+EMPTY               0      빈 항목
+RUN_LVL             1      시스템의 런레벨이 변경되었음을 나타냄
+BOOT_TIME           2      시스템 부팅 시각
+NEW_TIME            3      시스템 클럭이 변경된 다음의 시간 정보
+OLD_TIME            4      시스템 클럭이 변경되기 전의 시간 정보
+INIT_PROCESS        5      init이 생성한 프로세스임을 나타냄
+**LOGIN_PROCESS**   6      사용자 로그인을 위한 세션 리더 프로세스
+USER_PROCESS        7      일반 프로세스
+DEAD_PROCESS        8      종료한 프로세스
+ACCOUNTING          9      사용하지 않는 항목
+
+--- 
+
+##/var/log/utmp 파일 순차적으로 읽기 : getutent(3), setutent(3), endutent(3), utmpname(3)
+```
+#include <utmp.h>
+struct utmp *getutent(void);
+void setutent(void);
+void endutent(void);
+int utmpname(const char *file);
+```
+file : 지정할 파일명
+
+- getutent() 함수: /var/run/utmp 파일에서 로그인 정보를 순차적으로 읽음
+                   /var/run/utmp 파일의 끝을 만나면 널 포인터를 리턴
+- setutent() 함수: /var/run/utmp파일의 오프셋을 파일의 시작에 위치시킴
+- endutent() 함수: /var/run/utmp 파일을 닫음
+- utmpname() 함수: 로그인 정보 파일을 file로 지정한 다른 파일로 변경
+            예를 들어, last 명령에서 사용하는/var/adm/wtmp 파일로 변경할 때 사용
+
+```who
+01 #include <sys/types.h>
+02 #include <utmp.h>
+03 #include <stdio.h>
+04
+05 int main() {
+06  struct utmp *ut;
+07
+08  printf("LoginName Line\n");
+09  printf("---------------\n");
+10
+11  while ((ut=getutent()) != NULL) {
+12  if (ut->ut_type != USER_PROCESS)
+13  continue;
+14  printf("%s %s\n", ut->ut_user, ut->ut_line);
+15  }
+16 }
+```
+
+--- 
+
+# 시간 관리 함수
+
+## 초 단위로 현재 시간 정보 얻기 : time(2)
+```
+#include <time.h>
+
+time_t time(time_t *tloc);
+```
+tloc : 검색한 시간 정보를 저장할 주소
+
+- time() 함수는 1970년 1월 1일 0시 0분 0초(UTC)부터 현재까지 경과된 시간을 초 단위로 알림
+- tloc가 널이 아니면 tloc가 가리키는 주소에 시간 정보를 저장하고, 널이면 시간 정보를 리턴
+- time() 함수는 실패하면 -1을 리턴
+
+### date 명령어
+`$ data -d @~` // time함수로 얻은 정보를 날짜,시간으로 바꿔서 보여주는 명령어
+
+--- 
+
+## 마이크로초 단위로 시간 정보 얻기 : gettimeofday(3)
+```
+#include <sys/time.h>
+int gettimeofday(struct timeval *tv, struct timezone *tz);
+int settimeofday(const struct timeval *tv, const struct timezone *tz);
+```
+tv : 시간 정보 구조체 주소
+tz : 시간대 정보 구조체 주소 // 일반적으로는 NULL값 입력 // KST: +9
+
+- 시간 정보를 timeval 구조체에 저장해 리턴
+- tz는 시간대를 나타내는 구조체이지만 사용하지 않으므로 NULL로 지정해도 됨
+- timeval 구조체는 초와 마이크로초 단위로 시간 정보를 알려줌
+```
+struct timeval {
+time_t tv_sec; /* 초 */
+suseconds_t tv_usec; /* 마이크로초 */
+};
+```
+- tv가 널이면 시간 정보를 읽어올 수 없음
+- 성공하면 0을, 실패 하면 -1을 리턴
+
+--- 
+
+## 시간대 설정 : tzset(3)
+```
+#include <time.h>
+
+void tzset(void);
+```
+
+- 현재 지역의 시간대로 설정
+- 이 함수를 호출하면 **전역 변수**에 정보가 설정
+```
+extern char *tzname[2]; 
+extern long timezone;
+extern int daylight;
+```
+- tzname : 지역 시간대와 보정된 시간대명을 약어로 저장
+- timezone : UTC와 지역 시간대와의 시차를 초 단위로 저장
+- daylight : 서머타임제를 시행하면 1이 아니고, 그렇지 않으면 0임
+    - 서머타임 적용 중인지 여부와는 무관함, 서머타임을 지원하는 시간대임을 의미
+
+--- 
+
+## 시간 정보 분해: tm 구조체
+```
+#struct tm { 
+int tm_sec;     // 초(0~60) // 윤초(60)
+int tm_min;     // 분(0~59)
+int tm_hour;    // 시(0~23)
+int tm_mday;    // 일(1~31) // 일 수만 달력 체계로(0~30 X)
+int tm_mon;     // 월(0~11). 0은 1월, 11은 12월을 의미
+int tm_year;    // 연도. ‘연도 - 1900’ 값을 리턴 // 2025년 -> 125 (+1900)
+int tm_wday;    // 요일(0~6). 0은 일요일, 6은 토요일을 의미
+int tm_yday;    // 일 수(0~365) // 윤년(2월 29일)
+int tm_isdst;   // 서머타임제 시행 여부. 1이면 서머타임제 실시 중임을 의미
+};
+```
+
+--- 
+
+## 초 단위 시간 정보 분해 : gmtime(3), localtime(3)
+```
+#include <time.h>
+
+struct tm *gmtime(const time_t *timep);
+struct tm *localtime(const time_t *timep);
+```
+timep : **초 단위 시간 정보**를 저장한 주소
+
+- 두 함수 모두 초 단위 시간 정보를 인자로 받아 tm 구조체 형태로 리턴
+- gmtime() 함수: UTC(+0) 시간대를 기준으로 시간을 분해 // greenwich mean time
+- localtime() 함수: gmtime()과 같은 결과를 산출하지만, UTC(+0) 대신 지역 시간대를 기준으로 시간을 처리
+
+--- 
+
+## 초 단위 시간으로 역산 : mktime(3)
+```
+#include <time.h>
+time_t mktime(struct tm *tm);
+```
+tm : 시간 정보를 저장한 tm 구조체 주소
+
+- gmtime()이나 localtime() 함수와 반대 역할을 수행
+- tm 구조체 형태의 시간을 인자로 받아 이를 1970년 1월 1일 0:0:0(UTC)부터 얼마나 지났는지 초 단위로 계산해 리턴
+
+--- 
+
+## 초 단위 시간을 변환해 출력하기 : ctime(3)
+```
+#include <time.h>
+char *ctime(const time_t *timep); // calendar time
+```
+timep : 초 단위 시간 정보를 저장한 주소
+
+- 초 단위 시간을 인자로 받아 사람이 보기 편한 형태로 변환해 **문자열**로 리턴
+`요일 월 일 시:분:초 연도`
+
+--- 
+
+## tm 구조체 시간을 변환하여 출력하기 : asctime(3)
+```
+#include <time.h>
+char *asctime(const struct tm *tm);
+```
+tm : 시간 정보를 저장한 tm 구조체 주소
+
+- tm 구조체로 분해된 시간을 인자로 받고 사람이 보기 편한 형태로 변경해 문자열로 리턴
+- 출력되는 형태는 ctime() 함수의 출력 형태와 동일
+
+--- 
+
+## 출력 형식 기호를 사용하여 출력하기 : strftime(3)
+```
+#include <time.h>
+size_t strftime(char *s, size_t max, const char *format, const struct tm *tm);
+```
+s : 출력할 시간 정보를 저장할 배열 주소
+max : 배열 s의 크기
+format : 출력 형식을 지정한 문자열
+tm : 출력할 시간 정보를 저장한 구조체 주소
+
+- tm이 가리키는 tm 구조체에 저장된 시간 정보를 format에 지정한 출력 형식에 따라 변환해 s가 가리키는 배열에 저장
+
+- format 시간 정보 출력 형식 지정자
+    - %x: 지역시간대에 적합한 날짜 표시
+    - %X: 지역시간대에 적합한 시간 표시
+    - %d: 날짜(1~31)  
+    - %m: 월(01~12)
+    - %k: 24시간 기준준 시간(0~23), 한자릿수는 앞에 공백추가
+    - %M: 분(00~59)
+    - %Y: 네 자리수 연도
+    - %D: 날짜(%m/%d/%y)
+    - %F: %Y-%m-%d 형태로 표현
 
