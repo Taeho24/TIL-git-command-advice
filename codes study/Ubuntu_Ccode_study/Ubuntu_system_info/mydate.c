@@ -63,7 +63,7 @@ int check_no_option(int argc, int *show_all, int total_flags, int use_format) {
 }
 
 // 결과 출력 함수
-void print_selected(struct tm *t, char **weekdays, int y, int m, int d, int w, int h) {
+void print_selected(struct tm *t, const char **weekdays, int y, int m, int d, int w, int h) {
     if (y) printf("연도: %04d\n", t->tm_year + 1900);
     if (m) printf("월: %02d\n", t->tm_mon + 1);
     if (d) printf("일: %02d\n", t->tm_mday);
