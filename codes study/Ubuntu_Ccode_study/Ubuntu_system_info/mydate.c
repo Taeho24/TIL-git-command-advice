@@ -20,7 +20,7 @@ $ mydate
 
 // 사용법 출력 함수
 void print_usage() {
-    printf("사용법: mydate [옵션들]\n");
+    printf("사용법: mydate [옵션]\n");
     printf("[option]\n");
     printf("  -a, --all         : 연, 월, 일, 요일, 시, 분, 초 출력 (단독으로 사용)\n");
     printf("  -y, --year        : 연도만 출력\n");
@@ -45,19 +45,20 @@ void print_usage() {
 }
 
 // 조건에 맞는 경우 사용법을 출력하고 종료하는 함수
-int check_no_option(int argc, int show_all, int total_flags, int use_format) {
+int check_no_option(int argc, int *show_all, int total_flags, int use_format) {
     // 옵션이 없을 때
     if (argc == 1) {
-        show_all = 1; // 기본적으로 -a(모든 항목) 옵션 적용
+        *show_all = 1; // 기본적으로 -a(모든 항목) 옵션 적용
+        fprintf(stderr, "Default option set: -a\n");
         // print_usage();
         return 0;
     }
     // 유효한 옵션이 없을 때 처리
     if (!show_all && !total_flags && !use_format) {
+        fprintf(stderr, "유효한 옵션이 없습니다.\n");
         print_usage();
         return 1;  
     }
-
     return 0;  // 정상적으로 진행
 }
 
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    char *weekdays[] = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};
+    const char *weekdays[] = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};
 
     const struct option long_options[] = {
         {"all",     no_argument,       0, 'a'},
@@ -133,7 +134,7 @@ int main(int argc, char *argv[]) {
     int total_flags = show_year + show_month + show_day + show_weekday + show_hour;
 
     // 옵션 유효성 체크
-    if (check_no_option(argc, show_all, total_flags, use_format)) {
+    if (check_no_option(argc, &show_all, total_flags, use_format)) {
         return 0;  
     }
 
