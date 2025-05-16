@@ -449,9 +449,116 @@ buf : 실행 시간을 저장할 tms 구조체의 주소
 --- 
 
 # 환경 변수
+
 - 환경 변수는 ‘환경 변수명=값' 형태로 구성
 - 환경 변수명은 관례적으로 대문자를 사용
 - 환경 변수는 셸에서 값을 설정하거나 변경할 수 있으며 함수를 이용해 읽거나 설정할 수 있음
 - 현재 셸의 환경 설정을 보려면 `env 명령`을 사용
 
 
+## 특징
+- (1) 전역성: 쉘과 하위 프로세스에 자동으로 전달됨
+- (2) **텍스트 기반**: 변수는 문자열로 저장됨 (KEY=VALUE 형태)
+- (3) 쉘에 의존적 아님: Bash, Zsh 등 대부분의 쉘에서 사용 가능
+
+| 변수명   | 설명                                      |
+|----------|------------------------------------------|
+| HOME     | 사용자의 홈 디렉토리 경로                  |
+| USER     | 현재 로그인한 사용자 이름                  |
+| PATH     | 실행 파일을 검색할 디렉토리 목록           |
+| SHELL    | 현재 사용하는 쉘 프로그램 경로             |
+| LANG     | 시스템의 언어 설정                         |
+| TERM     | 터미널 타입 정보 (예: xterm, vt100)        |
+| PWD      | 현재 작업 중인 디렉토리 경로               |
+| EDITOR   | 기본 텍스트 편집기 설정                    |
+| LOGNAME  | 로그인 사용자 이름                         |
+
+
+## 환경변수 설정 파일
+| 파일 경로            | 설명                                                   |
+|----------------------|--------------------------------------------------------|
+| `~/.bashrc`          | Bash 쉘용 개인 설정 파일 (인터랙티브 쉘)              |
+| `~/.bash_profile`    | 로그인 시 실행되는 설정 파일                          |
+| `/etc/profile`       | 시스템 전체 사용자에 적용되는 설정 파일               |
+| `/etc/environment`   | 환경 변수만 설정하는 시스템 전역 파일                 |
+
+
+## 환경 변수 설정 및 사용 방법
+
+1. 환경 변수 설정 (현재 세션만)
+```bash
+export PROJECT_DIR=/home/user/myproject
+```
+2. 변수 사용
+`cd $PROJECT_DIR`
+3. 영구 설졍 (예: ~./bashrc 파일에 추가)
+```
+echo "export PATH=\$PATH:/home/user/bin" >> ~/.bashrc
+source ~/.bashrc
+```
+
+--- 
+
+## 전역 변수 사용 : environ
+```
+#include <unistd.h>
+extern char **environ;
+```
+- 전역 변수 environ은 환경 변수 전체에 대한 포인터
+- 이 변수를 사용해 환경 변수를 검색할 수 있음
+
+`#int main(int argc, char **argv, char **envp)`
+- 사용 방법은 전역 변수 environ과 같음
+
+--- 
+
+## 환경 변수 검색 : getenv(3) 
+```
+#include <stdlib.h>
+char *getenv(const char *name);
+```
+name : 환경 변수명
+
+- 인자로 지정한 환경 변수가 설정되어 있는지 검색해 결과값을 저장하고 주소를 리턴
+- 검색에 실패하면 널 포인터를 리턴
+
+--- 
+
+## 환경 변수 설정 : putenv(3)
+```
+#include <stdlib.h>
+int putenv(char *string);
+```
+string : 설정할 환경 변수와 값으로 구성한 문자열
+
+- 설정할 환경 변수를 ‘환경 변수명=값’ 형태로 지정하여 프로그램에서 환경 변수를 설정
+- putenv() 함수는 기존의 환경 변숫값은 변경하고, 새로운 환경 변수는 malloc()으로 메모리를 할당해 추가
+- 수행에 성공하면 0을 리턴
+
+--- 
+
+## 환경 변수 설정 : setenv(3)
+```
+#include <stdlib.h>
+int setenv(const char *name, const char *value, int overwrite);
+```
+name : 환경 변수명 
+value : 환경 변숫값
+overwrite : 덮어쓰기
+
+- putenv() 함수처럼 환경 변수를 설정하지만 다른 점은 변수와 환경 변숫값을 각각 인자로 지정
+- setenv() 함수는 name에 지정한 환경 변수에 value의 값을 설정
+
+- overwrite는 name으로 지정한 환경 변수에 이미 값이 설정되어 있을 경우 덮어쓰기 여부를 지정
+- overwrite 값이 0이 아니면 덮어쓰기를 하고 0이면 덮어쓰기를 하지 않음
+
+--- 
+
+## 환경 변수 설정 삭제 : unsetenv(3)
+```
+#include <stdlib.h>
+int unsetenv(const char *name);
+```
+
+- name에 지정한 환경 변수를 삭제
+- 현재 환경에 name으로 지정한 환경 변수가 없으면 기존 환경을 변경하지 않음
