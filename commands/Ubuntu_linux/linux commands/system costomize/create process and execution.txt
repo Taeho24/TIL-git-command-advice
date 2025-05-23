@@ -537,7 +537,9 @@ options : waitid() 함수의 리턴 조건
         - P_PID : pid가 id와 일치하는 자식 프로세스를 기다림
         - P_GID : gid가 id와 일치하는 자식 프로세스를 기다림
         - P_ALL : 모든 자식 프로세스를 기다림, 이 경우 id 값은 무시
+
     - id: pid나 gid 등 자식 프로세스를 구분할 수 있는 식별 번호를 지정
+
     - infop: waitid() 함수가 성공하면 결괏값을 채워서 돌려주는 siginfo_t 구조체
         - si_pid : 자식 프로세스의 PID 
         - si_uid : 자식 프로세스의 UID 
@@ -549,6 +551,7 @@ options : waitid() 함수의 리턴 조건
         - CLD_DUMPED : 자식 프로세스가 시그널을 받고 종료하고 코어 덤프 수행
         - CLD_STOPPED : 자식 프로세스가 시그널을 받고 중단된 상태
         - CLD_CONTINUE : SIGCONT 시그널을 받고 자식 프로세스가 계속 실행
+        
     - options : waitid() 함수의 리턴 조건은 다음 값을 OR로 연결할 수 있음
         - WEXITED : 자식 프로세스가 종료될 때까지 기다림
         - WSTOPPED : 시그널을 받아 중단된 자식 프로세스를 기다림
