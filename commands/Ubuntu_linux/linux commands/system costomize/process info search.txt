@@ -394,6 +394,44 @@ clock_t tms_cstime; // times() 함수를 호출한 프로세스의 모든 자식
 };
 ```
 
+---
+
+## 실행 시간 측정 : clock(3)
+```
+#include <time.h>
+clock_t clock(void);
+```
+- clock()은 프로세스가 실행되는 동안 소모된 CPU 시간을 측정합니다. 이 시간은 실제 시스템 클럭 주기 수로 반환되며, 전체 CPU 시간을 나타냅니다.
+- 이는 실제 시간을 측정하는 함수가 아니라, CPU 시간만 측정합니다. 즉, 대기 시간이나 I/O 작업 등은 포함되지 않습니다.
+
+CLOCKS_PER_SEC: clock()함수에서 반환한 C라이브러리에서 정한 상수
+프로그램의 CPU 시간을 시스템 클럭 주기(ticks)로 반환
+
+```
+#include <stdio.h>
+#include <time.h>
+
+int main() {
+    clock_t start, end;
+    double elapsed_time;
+
+    // 시작 시간 측정
+    start = clock();
+
+    // 예시로 대기 (for문)
+    for (volatile int i = 0; i < 100000000; i++);
+
+    // 종료 시간 측정
+    end = clock();
+
+    // 경과 시간 계산 (초 단위로 변환)
+    elapsed_time = (double)(end - start) / CLOCKS_PER_SEC;
+
+    printf("Elapsed time: %f seconds\n", elapsed_time);
+
+    return 0;
+}
+```
 --- 
 
 ## 실행 시간 측정 : times(2)
