@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 #include <string.h>
 
-#define ENV_BUF_SIZE 512
+#define CMD_BUF_SIZE 512
 
 int main(int argc, char *argv[]) {
     if (argc != 3) {
