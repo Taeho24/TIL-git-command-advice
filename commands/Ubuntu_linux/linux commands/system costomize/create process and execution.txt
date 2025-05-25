@@ -430,26 +430,26 @@ wstatus : 상태 정보를 저장할 주소
 05 #include <stdio.h>
 06
 07 int main() {
-08 int status;
-09 pid_t pid;
+08  int status;
+09  pid_t pid;
 10
-11 switch (pid = fork()) {
-12 case -1 : /* fork failed */
-13 perror("fork");
-14 exit(1);
-15 break;
-16 case 0 : /* child process */
-17 printf("--> Child Process\n");
-18 exit(2);
-19 break;
-20 default : /* parent process */
-21 while (wait(&status) != pid)
-22 continue;
-23 printf("--> Parent process\n");
-24 printf("Status: %d, %x\n", status, status);
-25 printf("Child process Exit Status:%d\n", status >> 8); // 하위 8비트는 종료 이유 저장
-26 break;
-27 }
+11  switch (pid = fork()) {
+12      case -1 : /* fork failed */
+13          perror("fork");
+14          exit(1);
+15          break;
+16      case 0 : /* child process */
+17          printf("--> Child Process\n");
+18          exit(2);
+19          break;
+20      default : /* parent process */
+21          while (wait(&status) != pid)
+22              continue;
+23          printf("--> Parent process\n");
+24          printf("Status: %d, %x\n", status, status);
+25          printf("Child process Exit Status:%d\n", status >> 8); // 하위 8비트는 종료 이유 저장
+26          break;
+27  }
 28 }
 ```
 
