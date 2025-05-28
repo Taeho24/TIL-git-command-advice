@@ -235,6 +235,9 @@ on_exit의 int는 status로 exit(0)실행 시, 종료 값 0 을 나타냄
 15
 16  exit(0);
 17 }
+
+>Cleanup 2 is called: 20.
+>Cleanup 1 is called.
 ```
 
 --- 
