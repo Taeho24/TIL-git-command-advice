@@ -29,8 +29,8 @@ int main() {
     struct sigaction sa;
     sigset_t st_mask;
 
-    act.sa_sigaction = sigint_handler;
-    act.sa_flags = SA_SIGINFO;
+    sa.sa_sigaction = sigint_handler;
+    sa.sa_flags = SA_SIGINFO;
 
     if (sigaction(SIGINT, &sa, NULL) == -1) {
         perror("sigaction(SIGINT)");
@@ -49,7 +49,7 @@ int main() {
     sigaddset(&st_mask, SIGINT);
 
     // sigaction으로 SIGINT 처리 함수 등록
-    if (sigaction(SIGINT, &act, (struct sigaction *)NULL) < 0>) {
+    if (sigaction(SIGINT, &sa, (struct sigaction *)NULL) < 0) {
         perror("sigaction 실패");
         exit(EXIT_FAILURE);
     }
