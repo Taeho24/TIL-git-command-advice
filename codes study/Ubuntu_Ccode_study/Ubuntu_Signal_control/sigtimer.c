@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/times.h>
+#include <time.h>
 
 // SIGALRM 시그널 핸들러
 void print_message(int signo) {
