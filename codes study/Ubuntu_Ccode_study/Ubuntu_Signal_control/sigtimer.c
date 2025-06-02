@@ -12,20 +12,24 @@
 // SIGALRM 시그널 핸들러
 void print_message(int signo) {
     if (signo == SIGALRM) {
-        struct tms cpu_times;
-        int ct = sysconf(_SC_CLK_TCK);
-
-        if (times(&cpu_times) == (clock_t)-1) {
-            perror("times");
-            exit(EXIT_FAILURE);
+        time_t now = time(NULL);
+        if (now == ((time_t)-1)) {
+            perror("time");
+            return 1;
+        }
+        struct tm *time_info = localtime(&now);
+        if (time_info == NULL) {
+            perror("localtime");
+            return 1;
         }
 
-        double user_time = (double)cpu_times.tms_utime / ct;
-        double system_time = (double)cpu_times.tms_stime / ct;
-
-        // 실행 시간 출력
-        printf("사용자 모드 실행 시간: %f 초\n", user_time);
-        printf("시스템 모드 실행 시간: %f 초\n", system_time);
+        printf("현재 시각: %04d-%02d-%02d %02d:%02d:%02d\n",
+            time_info->tm_year + 1900,
+            time_info->tm_mon + 1,
+            time_info->tm_mday,
+            time_info->tm_hour,
+            time_info->tm_min,
+            time_info->tm_sec);
     }
 }
 
