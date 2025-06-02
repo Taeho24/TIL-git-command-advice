@@ -15,12 +15,12 @@ void print_message(int signo) {
         time_t now = time(NULL);
         if (now == ((time_t)-1)) {
             perror("time");
-            return 1;
+            exit(EXIT_FAILURE);
         }
         struct tm *time_info = localtime(&now);
         if (time_info == NULL) {
             perror("localtime");
-            return 1;
+            exit(EXIT_FAILURE);
         }
 
         printf("현재 시각: %04d-%02d-%02d %02d:%02d:%02d\n",
@@ -39,6 +39,7 @@ int main() {
 
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = print_message;
+    sa.sa_flags = SA_RESTART;
 
     if (sigaction(SIGALRM, &sa, NULL) == -1) {
         perror("sigaction");
