@@ -57,7 +57,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    printf("1초마다 실행 시간 및 CPU 사용시간을 출력합니다.\n");
+    printf("1초마다 현재시간을 출력합니다.\n");
 
     // 무한 대기 (시그널을 기다림)
     while (1) {
