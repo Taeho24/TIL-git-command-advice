@@ -16,19 +16,19 @@ void sigint_handler(int signo, siginfo_t *info, void *context) {
     }
 
     printf("\n[SIGINT 핸들러 작동]\n");
-
-    psiginfo(info, "Received Signal:");
+    psiginfo(info, "시그널 정보:");
     printf("시그널 번호: %d\n", signo);
     printf("si_code: %d\n", info->si_code);
-
     printf("프로그램을 종료합니다.\n");
+
     exit(EXIT_SUCCESS);
 }
 
 int main() {
     struct sigaction sa;
-    sigset_t st_mask;
 
+    // SIGINT 핸들러 설정
+    memset(&sa, 0, sizeof(sa));
     sa.sa_sigaction = sigint_handler;
     sa.sa_flags = SA_SIGINFO;
 
@@ -37,36 +37,25 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // 모든 시그널 무시 (SIGINT 제외)
+    // SIGINT를 제외한 모든 시그널 무시
     for (int i = 1; i < NSIG; ++i) {
-        if (i != SIGINT) {
-            signal(i, SIG_IGN);
-        }
+        if (i == SIGKILL || i == SIGSTOP || i == SIGINT)
+            continue;
+
+        // 무시할 수 없는 시그널에 대한 오류 방지
+        struct sigaction ignore_sa;
+        memset(&ignore_sa, 0, sizeof(ignore_sa));
+        ignore_sa.sa_handler = SIG_IGN;
+        sigaction(i, &ignore_sa, NULL);
     }
 
-    // SIGINT만 허용하는 마스크 생성
-    sigemptyset(&st_mask);
-    sigaddset(&st_mask, SIGINT);
+    printf("SIGINT (Ctrl+C)를 기다리는 중입니다. 다른 시그널은 무시됩니다.\n");
 
-    // sigaction으로 SIGINT 처리 함수 등록
-    if (sigaction(SIGINT, &sa, (struct sigaction *)NULL) < 0) {
-        perror("sigaction 실패");
-        exit(EXIT_FAILURE);
+    while (1) {
+        pause();
     }
-
-    printf("SIGINT(Ctrl+C)를 기다리는 중입니다. 종료하려면 Ctrl+C를 누르세요.\n");
-
-    sigfillset(&st_mask);           // 모든 시그널을 차단
-    sigdelset(&st_mask, SIGINT);    // SIGINT만 허용
-    
-    if (sigprocmask(SIG_SETMASK, &st_mask, NULL) == -1) {
-        perror("sigprocmask");
-        exit(EXIT_FAILURE);
-    }
-
-    sigsuspend(&st_mask);
 
     printf("시그널 실패!\n");
-
+    
     return EXIT_SUCCESS;
 }

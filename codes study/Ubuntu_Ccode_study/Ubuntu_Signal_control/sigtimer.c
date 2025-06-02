@@ -7,14 +7,15 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <sys/times.h>
 
 // SIGALRM 시그널 핸들러
 void print_message(int signo) {
     if (signo == SIGALRM) {
         struct tms cpu_times;
-        clock_t ct = sysconf(_SC_CLK_TCK);
+        int ct = sysconf(_SC_CLK_TCK);
 
-        if (times(&cpu_times); == (clock_t)-1) {
+        if (times(&cpu_times) == (clock_t)-1) {
             perror("times");
             exit(EXIT_FAILURE);
         }
@@ -32,6 +33,7 @@ int main() {
     struct sigaction sa;
     struct itimerval timer;
 
+    memset(&sa, 0, sizeof(sa));
     sa.sa_handler = print_message;
 
     if (sigaction(SIGALRM, &sa, NULL) == -1) {

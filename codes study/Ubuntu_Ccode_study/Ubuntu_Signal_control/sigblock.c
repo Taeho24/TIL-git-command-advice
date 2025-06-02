@@ -2,8 +2,6 @@
 /* 반복문과 인터벌타임을 사용해 1초 간격으로 "Hanbit Books"를 출력하는 프로그램을 작성하시오.
 작성된 프로그램이 `Ctrl + C`로 종료되지 않도록 sigprocmask()함수를 이용해 블로킹하시오. */
 
-// 13, 15번 인터벌타임이용(sleepX)
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -11,9 +9,16 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+void print_message(int signo) {
+    if (signo == SIGALRM) {
+        printf("Hanbit Books\n");
+    }
+}
+
 int main() {
     sigset_t block_mask;
     struct itimerval timer;
+    struct sigaction sa;
 
     // SIGINT를 포함하는 시그널 집합 생성
     if (sigemptyset(&block_mask) == -1) {
@@ -41,6 +46,14 @@ int main() {
     } */
     
     // 인터벌타임 이용
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = print_message;
+
+    if (sigaction(SIGALRM, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+
     timer.it_value.tv_sec = 1;
     timer.it_value.tv_usec = 0;
     timer.it_interval.tv_sec = 1;
@@ -53,7 +66,6 @@ int main() {
 
     // 무한 대기
     while (1) {
-        printf("Hanbit Books\n");
         pause(); // 시그널 발생 시까지 대기
     }
     return 0;
