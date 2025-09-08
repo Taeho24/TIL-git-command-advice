@@ -52,6 +52,8 @@
     - `git fetch`명령어를 사용하면 원격 저장소의 브랜치에 있는 커밋 내역이, 로컬저장소로 '가져와진다'.
     - `git fetch --all`명령어는 `git remote update`명령어와 동일한 역할을 한다.
 
+    - ` git fetch --prune`명령어는 Remote에 존재하지 않는 브랜치들을 Local에 반영하여 삭제한다.
+        = `git remote prune origin`
 
 ### PUSH
     - commit 만들기
@@ -102,9 +104,9 @@ git init 명령어 입력시, 해당 경로에 있는 폴더가 일반 폴더에
 
 https://github.com/boostcampwm-2022
 이슈트랙커
-commit 메시지 에 연동
+commit 메시지에 연동
 
-마크다운 문법공부!
+# 마크다운 문법공부!
 
 `git remote add origin [깃헙주소]`
 - [깃헙주소]를 origin 이라는 명칭으로 즐겨찾기생성
@@ -121,7 +123,7 @@ git remote set-head origin -a
 //git hub 참조 명령문
 
 // 원격 브랜치 연결하기
-`git remote update`
+`git remote update` : Remote에 존재하는 브랜치들을 가져오기
 `git checkout -t origin/[branch name]`
 
 
