@@ -2,3 +2,6 @@
 .venv
 venv/
 venv.bak/
+
+# API_crawling
+venv_API/
