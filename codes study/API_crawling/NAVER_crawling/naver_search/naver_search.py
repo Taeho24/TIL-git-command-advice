@@ -8,7 +8,7 @@ import json
 import urllib.request
 
 #[CODE 1]
-def getRequestUrl(url):
+def getRequestUrl(url, client_id, client_secret):
     req = urllib.request.Request(url)
     req.add_header("X-Naver-Client-Id", client_id)
     req.add_header("X-Naver-Client-Secret", client_secret)
@@ -23,13 +23,13 @@ def getRequestUrl(url):
     return None
 
 #[CODE 2]
-def getNaverSearch(node, srcText, start, display):
+def getNaverSearch(node, srcText, start, display, client_id, client_secret):
     base = "https://openapi.naver.com/v1/search"
     node = "/%s.json" % node
     parameters = "?query=%s&start=%s&display=%s" % \
                  (urllib.parse.quote(srcText), start, display)  
     url = base + node + parameters
-    responseDecode = getRequestUrl(url) #[CODE 1]
+    responseDecode = getRequestUrl(url, client_id, client_secret) #[CODE 1]
     if (responseDecode == None):
         return None
     else:
