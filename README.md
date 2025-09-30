@@ -19,6 +19,9 @@ TIL-git-command-advice/
 │   │   │   ├── NAVER_crawling/
 │   │   │   └── public_infor_crawling/
 │   │   └── WEB_crawling/
+│   │       ├── robots_check.txt
+│   │       ├── BeautifulSoup/
+│   │       └── Selenium/
 │   ├── Buffer_inputLimit/
 │   ├── Mono-Alphabetic Substitution Cipher/
 │   ├── Sorting_Algorithm/

@@ -1,0 +1,33 @@
+# BeautifulSoup 라이브러리를 사용하기 위해 추가 설치작업을 실시:
+## 명령 프롬프트 창에서 pip 명령을 사용
+`pip install beautifulsoup4`
+
+## 설치가 끝나면 파이썬 셸 창에서 BeautifulSoup을 임포트하여 사용
+`>>> from bs4 import BeautifulSoup`
+
+## 연습용 html을 작성
+```
+>>> html = '<h1 id="title">한빛출판네트워크</h1><div class="top"><ul class="menu"><li><a 
+href=“http://www.hanbit.co.kr/member/login.html” class="login">로그인</a></li></ul><ul 
+class="brand"><li><a href="http://www.hanbit.co.kr/media/">한빛미디어</li><li><a 
+href="http://www.hanbit.co.kr/academy/">한빛아카데미</a></li></ul></div>'
+```
+
+## BeautifulSoup 객체를 생성
+```
+>>> soup = BeautifulSoup(html, 'html.parser')
+>>> type(soup)
+````
+
+
+# pip 오류 메시지
+```
+You should consider upgrading via the `C`:\Users\~\anaconda3\python.exe -m pip install --upgrade pip command.
+```
+- pip 명령어를 이용한 install 과정을 실제 아나콘다(anaconda3) 환경이 아닌 네이티브 환경에 설치해주어야 함
+
+## 실제 Python이 설치된 경로의 pip 명령어가 존재하는 위치까지 이동
+```
+ C:\Users\~\AppData\Local\Programs\Python\Python313\Scripts > pip install beautifulsoup4
+```
+- (주의) 경로는 자신의 설치환경(python) 버전에 따라 달라질 수 있음

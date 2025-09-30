@@ -1,0 +1,43 @@
+# 크롤링 허용 여부 확인하기
+– 웹 페이지를 크롤링하기 전에 크롤링 허용 여부를 확인하기 위해 주소 창에 ‘크롤링할 주소/robots.txt’를 입력
+– 만약 robots.txt 파일이 없다면 수집에 대한 정책이 없으니 크롤링을 해도 된다는 의미
+
+# robots.txt 주요 규칙 정리
+## 기본 구조
+-  User-agent : 규칙이 적용될 크롤러(예: Googlebot, Bingbot)
+    - *는 모든 크롤러에 적용
+- Disallow : 접근을 차단할 경로
+- Allow : 접근을 허용할 경로
+```
+User-agent: <크롤러 이름 또는 *>
+Disallow: <차단할 경로>
+Allow: <허용할 경로>
+```
+
+## 주요 지시어 (Directives)
+- (1) User-agent
+    - 대상 크롤러 지정
+    `User-agent: Googlebot`
+- (2) Disallow
+    - 특정 경로를 차단
+    `Disallow: /private/ # /private/ 이하 모든 경로 차단`
+    `Disallow: /secret.html # 특정 파일 차단`
+- (3) Allow
+    - 차단 규칙 내에서도 특정 경로는 허용
+    `Disallow: /images/`
+    `Allow: /images/public/`
+
+## 패턴 매칭 규칙
+- * : 0개 이상의 임의 문자열과 매칭
+- $ : URL 끝을 의미
+
+## 규칙 적용 원칙
+- 더 구체적인 규칙이 우선
+    - Allow: /public/ vs Disallow: / → /public/은 접근 허용, 나머진 차단
+
+    - `User-agent: *`
+        - 모든 크롤러에게 적용("세부 규칙"이 없는 agent만)
+
+- 웹 페이지를 크롤링하기 전에 크롤링 허용 여부를 확인하기 위해 주소 창에 '크롤링할 주소/robots.txt'를 입력
+
+- 만약 robots.txt 파일이 없다면 수집에 대한 정책이 없으니 크롤링을 해도 된다는 의미
