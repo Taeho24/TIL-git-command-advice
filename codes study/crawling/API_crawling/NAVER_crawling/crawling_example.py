@@ -1,3 +1,4 @@
+# (https://developers.naver.com/docs/common/openapiguide/)
 # 네이버 카페 API예제는 카페 가입과 카페 글쓰기 및 multipart 이미지 첨부 예제로 구성되어 있습니다.
 """ 
 # 네이버 API 예제 - 카페 가입하기
