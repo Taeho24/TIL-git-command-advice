@@ -127,23 +127,9 @@ public class BootSpringBootApplication {
 ```
 
 * 코드블럭코드("\```") 을 이용하는 방법
-```
-```
-public class BootSpringBootApplication {
-  public static void main(String[] args) {
-    System.out.println("Hello, Honeymon");
-  }
-}
-```
-```
-
->**깃헙**에서는 코드블럭코드("\```") 시작점에 사용하는 언어를 선언하여 
->[문법강조(Syntax highlighting)](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting)이 가능하다.
-
 <pre>
 <code>
-```java
-> 색 적용
+```
 public class BootSpringBootApplication {
   public static void main(String[] args) {
     System.out.println("Hello, Honeymon");
@@ -153,21 +139,44 @@ public class BootSpringBootApplication {
 </code>
 </pre>
 
+>**깃헙**에서는 코드블럭코드("\```") 시작점에 사용하는 언어를 선언하여 [문법강조(Syntax highlighting)](https://docs.github.com/en/github/writing-on-github/creating-and-highlighting-code-blocks#syntax-highlighting)가 가능하다.
+
+<pre>
+<code>
+```java
+public class BootSpringBootApplication {
+  public static void main(String[] args) {
+    System.out.println("Hello, Honeymon");
+  }
+}
+```
+</code>
+</pre>
+```java
+> 색 적용
+public class BootSpringBootApplication {
+  public static void main(String[] args) {
+    System.out.println("Hello, Honeymon");
+  }
+}
+```
 
 ## 2.5. 수평선 ```<hr/>```
 아래 줄은 모두 수평선을 만든다. 마크다운 문서를 미리보기로 출력할 때 *페이지 나누기* 용도로 많이 사용한다.
 
 
 * * *
-
 ***
-
 *****
-
 - - -
-
 ---------------------------------------
-
+```
+* * *
+***
+*****
+- - -
+---------------------------------------
+```
 
 
 ## 2.6. 링크
@@ -185,7 +194,7 @@ Link: [Google][googlelink]
 ```
 
 
-* 외부링크
+* 외부링크 & 인라인 링크
 ```
 사용문법: [Title](link)
 적용예: [Google](https://google.com, "google link")
@@ -234,15 +243,40 @@ __double underscores__
 <img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" width="40%" height="30%" title="%(비율) 크기 설정" alt="RubberDuck"></img>
 
 ## 2.9. 줄바꿈
-3칸 이상 띄어쓰기(` `)를 하면 줄이 바뀐다.
+1. 3칸 이상 띄어쓰기(` `)를 하면 줄이 바뀐다.
 
 ```
 * 줄 바꿈을 하기 위해서는 문장 마지막에서 3칸이상을 띄어쓰기해야 한다.___\\ 띄어쓰기
 이렇게
 ```
 
-* 줄 바꿈을 하기 위해서는 문장 마지막에서 3칸이상을 띄어쓰기해야 한다.    \
+* 줄 바꿈을 하기 위해서는 문장 마지막에서 3칸이상을 띄어쓰기해야 한다.   \
 이렇게
+
+2. `<br>`태그 사용
+```
+첫 번째 줄입니다.<br>
+두 번째 줄입니다.___[ENTER]
+세 번째 줄입니다.
+```
+첫 번째 줄입니다.<br>
+두 번째 줄입니다.   \
+세 번째 줄입니다.
+
+
+## 2.10. 접었다 펼 수 있는 콘텐츠
+* `<details><summary></details></summary>` 태그 사용
+
+```
+<details>
+  <summary>여기를 클릭하세요</summary>
+  <p>이 내용은 클릭하면 펼쳐집니다.</p>
+</details>
+```
+<details>
+  <summary>여기를 클릭하세요</summary>
+  <p>이 내용은 클릭하면 펼쳐집니다.</p>
+</details>
 
 
 ****

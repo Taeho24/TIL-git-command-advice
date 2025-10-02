@@ -10,7 +10,7 @@
 ```markdown
 TIL-git-command-advice/
 ├── README.md
-├── Markdown_grammer.txt
+├── Markdown_grammer.md
 ├── C++numbering.txt
 ├── codes study/
 │   ├── AA_Algorithm/
