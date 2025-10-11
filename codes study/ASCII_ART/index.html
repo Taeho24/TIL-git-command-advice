@@ -1,0 +1,44 @@
+<!-- 출처: https://www.youtube.com/watch?v=8tGIj076_8Q -->
+<!-- 참고: https://en.wikipedia.org/wiki/Whitespace_character -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+<body style="margin:0; font-family: 'consolas'; line-height: 85%; letter-spacing:2px; font-size:10px;">
+
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <h4></h4>
+    <script>
+        img_name = 'name.png'
+
+        let img =new Image()
+        img.src = img_name
+        
+        let canvas = document.querySelector('#canvas')
+        let ctx = canvas.getContext('2d')
+
+        let ascii = '@$#Y!=+~- '
+
+        img.addEventListener('load', function(){
+            ctx.drawImage(img, 0, 0)
+            for (let j = 0; j < 300; j += 5){
+                for (let i = 0; i < 300; i += 5){
+                    let pixel = ctx.getImageData(i, j, 1, 1).data
+                    let gray = 0.299*pixel[0] + 0.587*pixel[1] + 0.114*pixel[2]
+                    let index = Math.floor(gray/25.6)
+                    document.querySelector('h4').innerText += ascii[index]
+                    if (i >= 295) {
+                        document.querySelector('h4').innerHTML += '<br>'
+                    }
+                }
+            }
+        })
+
+    </script>
+
+</body>
+</html>
