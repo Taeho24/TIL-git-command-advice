@@ -73,6 +73,14 @@
         img.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
         img.src = 'free-icon-transform-text.png' // 기본 이미지
 
+        // 이미지 로드 성공 시 ASCII 변환 함수 호출
+        img.addEventListener('load', () => generateASCIIFromImage(img));
+
+        // 이미지 로드 실패 시 알림
+        img.addEventListener('error', () => {
+            alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
+        });
+
         const canvas = document.querySelector('canvas')
         const ctx = canvas.getContext('2d')
         const asciiCanvas = document.getElementById('ascii-canvas');
@@ -91,18 +99,34 @@
 
         let asciiImage = '';
 
+        function getCharSafe(chars, index, defaultChar = ' ') {
+            return (index >= 0 && index < chars.length) ? chars[index] : defaultChar;
+        }
+
         function generateASCIIFromImage(sourceImage) {
             const scale = parseFloat(scaleInput.value);
             const gap = parseInt(gapInput.value);
             const fontSize = parseInt(fontSizeInput.value);
             const asciiChars = asciiInput.value;
 
-            if (!asciiChars || asciiChars.length < 2) {
-            alert('ASCII 문자셋은 최소 2개 이상 입력하세요.');
-            return;
+            if (isNaN(scale) || scale <= 0 || scale > 1) {
+                alert('이미지 크기 비율은 0.1 ~ 1 사이의 숫자여야 합니다.');
+                return;
             }
-            const width = Math.floor(sourceImage.width * scale);
-            const height = Math.floor(sourceImage.height * scale);
+            if (isNaN(gap) || gap < 1 || gap > 20) {
+                alert('픽셀 간격은 1 ~ 20 사이의 정수여야 합니다.');
+                return;
+            }
+            if (isNaN(fontSize) || fontSize < 2 || fontSize > 20) {
+                alert('폰트 크기는 2 ~ 20 사이의 정수여야 합니다.');
+                return;
+            }
+            if (!asciiChars || asciiChars.length < 2) {
+                alert('ASCII 문자셋은 최소 2개 이상 입력하세요.');
+                return;
+            }
+            const width = Math.max(1, Math.floor(sourceImage.width * scale));
+            const height = Math.max(1, Math.floor(sourceImage.height * scale));
 
             // 크기에 맞춰 캔버스 크기 조정
             canvas.width = asciiCanvas.width = width;
@@ -115,7 +139,7 @@
             // ASCII 캔버스 초기화
             asciiCtx.clearRect(0, 0, width, height);
             asciiCtx.fillStyle = 'black';
-            asciiCtx.font = `${fontSize}px Consolas`;
+            asciiCtx.font = `${fontSize}px Consolas, monospace`;
             asciiCtx.textBaseline = 'top';
 
             // 캔버스 크기에 맞는 픽셀 데이터 가져오기
@@ -134,7 +158,7 @@
                 const gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
                 const charIndex = Math.min(asciiChars.length - 1, Math.floor(gray / (256 / asciiChars.length)));
-                const char = asciiChars[charIndex] || ' ';
+                const char = getCharSafe(asciiChars, charIndex);
                 line += char;
 
                 asciiCtx.fillText(char, x, y);
@@ -210,8 +234,12 @@
         document.getElementById('downloadTxtBtn').addEventListener('click', () => {
             let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
             if (!fileName) return;
-            if (!fileName.toLowerCase().endsWith('.txt')) fileName += '.txt';
+            
+            // 파일명에서 허용하지 않는 문자를 '_'로 변경
+            fileName = fileName.replace(/[\\/:*?"<>|]/g, '_');
 
+            if (!fileName.toLowerCase().endsWith('.txt')) fileName += '.txt';
+            
             const blob = new Blob([asciiImage], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
 
@@ -228,8 +256,11 @@
         document.getElementById('downloadPngBtn').addEventListener('click', () => {
             let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
             if (!fileName) return;
-            if (!fileName.toLowerCase().endsWith('.png')) fileName += '.png';
+            // 파일명 안전 처리
+            fileName = fileName.replace(/[\\/:*?"<>|]/g, '_');
 
+            if (!fileName.toLowerCase().endsWith('.png')) fileName += '.png';
+            
             const isTransparent = document.getElementById('transparentBgCheckbox').checked;
 
             // 임시 캔버스 생성
