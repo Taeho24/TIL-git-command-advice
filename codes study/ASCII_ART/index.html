@@ -7,88 +7,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASCII Art Generator</title>
 
+    <style>
+    body {
+      margin: 0;
+      font-family: 'Consolas', monospace;
+      line-height: 85%;
+      letter-spacing: 2px;
+      font-size: 10px;
+    }
+    #canvas, #ascii-canvas {
+      display: block;
+      margin-bottom: 10px;
+      border: 1px solid gray;
+    }
+    #ascii-output {
+      white-space: pre;
+      font-size: 10px;
+      line-height: 1;
+      margin-top: 10px;
+    }
+    #drop-area {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      margin: 15px 0;
+      min-height: 200px;
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: center; /* 가로 중앙 */
+      align-items: center;     /* 세로 중앙 */
+      text-align: center;      /* 텍스트가 여러 줄일 때 가운데 정렬 */
+    }
+    </style>
 </head>
-<body style="margin:0; font-family: 'consolas'; line-height: 85%; letter-spacing:2px; font-size:10px;">
+<body>
+    <h2>🎨 ASCII Art Generator</h2>
 
-    <canvas id="canvas" style="border: 1px solid gray;"></canvas>
-    <canvas id="ascii-canvas" style="display:none"></canvas>
+    <div style="margin:10px;">
+        <label>이미지 크기 비율: <input id="scaleInput" type="number" min="0.1" max="1" step="0.1" value="1" style="width:50px;"> (0.1~1)</label>
+        <label title="픽셀 간격이 너무 작으면 이미지가 너무 길어짐. 적당히 조절하세요."style="margin-left:15px;">변환 픽셀 간격(px): <input id="gapInput" type="number" min="1" max="20" step="1" value="5" style="width:50px;"></label>
+        <label style="margin-left:15px;">폰트 크기(px): <input id="fontSizeInput" type="number" min="2" max="20" step="1" value="6" style="width:50px;"></label>
+        <br><br>
+        <label>ASCII 문자셋: <input id="asciiInput" type="text" value="@$#Y!=+~- " style="width:200px;"></label>
+        <button id="generateBtn" style="margin-left:15px;">다시 생성</button>
+    </div>
+
+    <div id="drop-area">
+        이미지를 드래그하여 여기에 놓거나, 아래 버튼으로 업로드하세요.
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+
+    <canvas id="canvas"></canvas>
+    <canvas id="ascii-canvas" style="display:none;"></canvas>
     <h4 id="ascii-output"> </h4>
     <div style="margin:10px 0;">
-    <button id="downloadTxtBtn">TXT 텍스트 저장</button>
-    <button id="downloadPngBtn">PNG 이미지 저장</button>
+        <button id="downloadTxtBtn">TXT 텍스트 저장</button>
+        <button id="downloadPngBtn">PNG 이미지 저장</button>
+        <label>
+            <input type="checkbox" id="transparentBgCheckbox" title="체크 해제 시 배경이 흰색으로 채워짐" checked>
+                배경 투명
+        </label>
     </div>
 
     <script>
-        // #modifed: 이미지 경로와 ascii코드 지정
-        let img_name = 'name.jpg'
-        const asciiChars = '@$#Y!=+~- ' // 밝기 낮을수록 왼쪽
-
-        const img =new Image()
+        let img =new Image()
         img.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
-        img.src = img_name
+        img.src = 'free-icon-transform-text.png' // 기본 이미지
 
-        const canvas = document.querySelector('#canvas')
+        const canvas = document.querySelector('canvas')
         const ctx = canvas.getContext('2d')
-        const asciiCanvas = document.querySelector('#ascii-canvas');
+        const asciiCanvas = document.getElementById('ascii-canvas');
         const asciiCtx = asciiCanvas.getContext('2d');
 
-        const output = document.querySelector('#ascii-output');
-        const downloadTxtBtn = document.querySelector('#downloadTxtBtn');
-        const downloadPngBtn = document.querySelector('#downloadPngBtn');
+        const output = document.getElementById('ascii-output');
+        
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('fileInput');
+        
+        //const downloadTxtBtn = document.querySelector('downloadTxtBtn');
+        //const downloadPngBtn = document.querySelector('downloadPngBtn');
+
+        const scaleInput = document.getElementById('scaleInput');
+        const gapInput = document.getElementById('gapInput');
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        const asciiInput = document.getElementById('asciiInput');
+        const generateBtn = document.getElementById('generateBtn');
 
         let asciiImage = '';
 
-        img.addEventListener('load', function(){
-           // 이미지 크기에 맞춰 캔버스 크기 조정
-            canvas.width = asciiCanvas.width = img.width;
-            canvas.height = asciiCanvas.height = img.height;
+        function generateASCIIFromImage(sourceImage) {
+            const scale = parseFloat(scaleInput.value);
+            const gap = parseInt(gapInput.value);
+            const fontSize = parseInt(fontSizeInput.value);
+            const asciiChars = asciiInput.value;
+
+            if (!asciiChars || asciiChars.length < 2) {
+            alert('ASCII 문자셋은 최소 2개 이상 입력하세요.');
+            return;
+            }
+            const width = Math.floor(sourceImage.width * scale);
+            const height = Math.floor(sourceImage.height * scale);
+
+            // 크기에 맞춰 캔버스 크기 조정
+            canvas.width = asciiCanvas.width = width;
+            canvas.height = asciiCanvas.height = height;
 
             // 원본 이미지 그리기
-            ctx.drawImage(img, 0, 0, img.width, img.height);
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(sourceImage, 0, 0, width, height);
 
-            // 다시 배경 투명색으로 덮고 텍스트 그리기 준비
-            asciiCtx.clearRect(0, 0, asciiCanvas.width, asciiCanvas.height);
-            //ctx.fillStyle = 'white';
-            //ctx.fillRect(0, 0, width, height);
-            ctx.fillStyle = 'black';
-            ctx.font = "6px Consolas";
-            ctx.textBaseline = "top";
-      
+            // ASCII 캔버스 초기화
+            asciiCtx.clearRect(0, 0, width, height);
+            asciiCtx.fillStyle = 'black';
+            asciiCtx.font = `${fontSize}px Consolas`;
+            asciiCtx.textBaseline = 'top';
+
             // 캔버스 크기에 맞는 픽셀 데이터 가져오기
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
+            const imageData = ctx.getImageData(0, 0, width, height).data;
+            
             // 초기화
             asciiImage = '';
 
-            // #modifed: 픽셀 간격, 너무 작으면 너무 길어짐. 적당히 조절하세요.
-            const img_gap = 5;
+            for (let y = 0; y < height; y += gap) {
+            let line = '';
+            for (let x = 0; x < width; x += gap) {
+                const index = (y * width + x) * 4;
+                const r = imageData[index];
+                const g = imageData[index + 1];
+                const b = imageData[index + 2];
+                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
-            for (let j = 0; j < canvas.height; j += img_gap) {
-                let img_line = ''
-                for (let i = 0; i < canvas.width; i += img_gap) {
-                    const index = (j * canvas.width + i) * 4;  // RGBA는 4바이트씩
-                    const r = imageData[index];
-                    const g = imageData[index + 1];
-                    const b = imageData[index + 2];
+                const charIndex = Math.floor(gray / (256 / asciiChars.length));
+                const char = asciiChars[charIndex] || ' ';
+                line += char;
 
-                    // 회색조 변환
-                    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
-
-                    // 문자의 밝기 단계 계산
-                    const asciiIndex = Math.floor(gray / 25.6);
-                    const char = asciiChars[asciiIndex] || ' ';
-                    img_line += char;
-
-                    // ASCII 전용 캔버스에 문자 그리기 (숨겨진 canvas)
-                    asciiCtx.fillText(char, i, j);
-                    }
-                asciiImage += img_line + '\n';
+                asciiCtx.fillText(char, x, y);
             }
-
+            asciiImage += line + '\n';
+            }
             // 한 번에 DOM에 반영
             output.innerText = asciiImage;
+        }
 
-            /*for (let j = 0; j < 300; j += 5){
+        // 초기 이미지 로드 시
+        img.addEventListener('load', () => generateASCIIFromImage(img));
+        generateBtn.addEventListener('click', () => generateASCIIFromImage(img));
+        
+        // 원본 코드
+        /*img.addEventListener('load', function(){
+            ctx.drawImage(img, 0, 0)
+            for (let j = 0; j < 300; j += 5){
                 for (let i = 0; i < 300; i += 5){
                     let pixel = ctx.getImageData(i, j, 1, 1).data
                     let gray = 0.299*pixel[0] + 0.587*pixel[1] + 0.114*pixel[2]
@@ -98,30 +165,112 @@
                         document.querySelector('h4').innerHTML += '<br>'
                     }
                 }
-            }*/
+            }
+        })*/
+
+        // 드래그 앤 드롭 기능 추가
+        dropArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropArea.style.background = '#f8f8f8';
         });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.background = '';
+        });
+
+        dropArea.addEventListener('drop', e => {
+            e.preventDefault();
+            dropArea.style.background = '';
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('이미지 파일만 가능합니다.');
+                return;
+        }
+
+        const reader = new FileReader();
+            reader.onload = e => {
+                const newImg = new Image();
+                newImg.onload = () => {
+                img = newImg;
+                generateASCIIFromImage(img);
+                };
+                newImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
         // 다운로드 버튼 클릭 시 파일 생성 및 다운로드
         // TXT 저장 버튼
         document.getElementById('downloadTxtBtn').addEventListener('click', () => {
+            let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
+            if (!fileName) return;
+            if (!fileName.toLowerCase().endsWith('.txt')) fileName += '.txt';
+
             const blob = new Blob([asciiImage], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
+
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'ascii-art.txt';
+            a.download = fileName;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+
             URL.revokeObjectURL(url);
         });
-
         // PNG 저장 버튼
         document.getElementById('downloadPngBtn').addEventListener('click', () => {
-            const imageURL = asciiCanvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = imageURL;
-            a.download = 'ascii-art.png';
-            a.click();
+            let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
+            if (!fileName) return;
+            if (!fileName.toLowerCase().endsWith('.png')) fileName += '.png';
+
+            const isTransparent = document.getElementById('transparentBgCheckbox').checked;
+
+            // 임시 캔버스 생성
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = asciiCanvas.width;
+            tempCanvas.height = asciiCanvas.height;
+
+            if (!isTransparent) {
+                // 배경 흰색 채우기
+                tempCtx.fillStyle = 'white';
+                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            } else {
+                // 투명 배경 (기본 클리어)
+                tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+            }
+
+            // asciiCanvas 그림 복사
+            tempCtx.drawImage(asciiCanvas, 0, 0);
+
+            // Blob으로 변환 후 다운로드
+            tempCanvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                // 결과물 새창열기
+                window.open(url, '_blank');
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(url);
+            }, 'image/png');
         });
     </script>
 
 </body>
 </html>
+
