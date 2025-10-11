@@ -1,40 +1,72 @@
 <!-- 출처: https://www.youtube.com/watch?v=8tGIj076_8Q -->
 <!-- 참고: https://en.wikipedia.org/wiki/Whitespace_character -->
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>ASCII Art Generator</title>
 
 </head>
 <body style="margin:0; font-family: 'consolas'; line-height: 85%; letter-spacing:2px; font-size:10px;">
 
-    <canvas id="canvas" width="300" height="300" style="border: 1px solid gray;"></canvas>
+    <canvas id="canvas" style="border: 1px solid gray;"></canvas>
+    <canvas id="ascii-canvas" style="display:none"></canvas>
     <h4 id="ascii-output"> </h4>
-    <script>
-        img_name = 'name.png'
+    <div style="margin:10px 0;">
+    <button id="downloadTxtBtn">TXT 텍스트 저장</button>
+    <button id="downloadPngBtn">PNG 이미지 저장</button>
+    </div>
 
-        let img =new Image()
+    <script>
+        // #modifed: 이미지 경로와 ascii코드 지정
+        let img_name = 'name.jpg'
+        const asciiChars = '@$#Y!=+~- ' // 밝기 낮을수록 왼쪽
+
+        const img =new Image()
         img.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
         img.src = img_name
-        
-        let canvas = document.querySelector('#canvas')
-        let ctx = canvas.getContext('2d')
 
-        let ascii = '@$#Y!=+~- ' // 밝기 낮을수록 왼쪽
+        const canvas = document.querySelector('#canvas')
+        const ctx = canvas.getContext('2d')
+        const asciiCanvas = document.querySelector('#ascii-canvas');
+        const asciiCtx = asciiCanvas.getContext('2d');
+
+        const output = document.querySelector('#ascii-output');
+        const downloadTxtBtn = document.querySelector('#downloadTxtBtn');
+        const downloadPngBtn = document.querySelector('#downloadPngBtn');
+
+        let asciiImage = '';
 
         img.addEventListener('load', function(){
-            ctx.drawImage(img, 0, 0, 300, 300);
-            
-            // 이미지 데이터 한 번에 불러오기
-            const imageData = ctx.getImageData(0, 0, 300, 300).data;
-            let asciiImage = '';
+           // 이미지 크기에 맞춰 캔버스 크기 조정
+            canvas.width = asciiCanvas.width = img.width;
+            canvas.height = asciiCanvas.height = img.height;
 
-            // 5픽셀 간격으로 루프
-            for (let j = 0; j < 300; j += 5) {
-                for (let i = 0; i < 300; i += 5) {
-                    const index = (j * 300 + i) * 4;  // RGBA는 4바이트씩
+            // 원본 이미지 그리기
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+
+            // 다시 배경 투명색으로 덮고 텍스트 그리기 준비
+            asciiCtx.clearRect(0, 0, asciiCanvas.width, asciiCanvas.height);
+            //ctx.fillStyle = 'white';
+            //ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = 'black';
+            ctx.font = "6px Consolas";
+            ctx.textBaseline = "top";
+      
+            // 캔버스 크기에 맞는 픽셀 데이터 가져오기
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+            // 초기화
+            asciiImage = '';
+
+            // #modifed: 픽셀 간격, 너무 작으면 너무 길어짐. 적당히 조절하세요.
+            const img_gap = 5;
+
+            for (let j = 0; j < canvas.height; j += img_gap) {
+                let img_line = ''
+                for (let i = 0; i < canvas.width; i += img_gap) {
+                    const index = (j * canvas.width + i) * 4;  // RGBA는 4바이트씩
                     const r = imageData[index];
                     const g = imageData[index + 1];
                     const b = imageData[index + 2];
@@ -44,13 +76,17 @@
 
                     // 문자의 밝기 단계 계산
                     const asciiIndex = Math.floor(gray / 25.6);
-                    asciiImage += ascii[asciiIndex] || ' ';
-                }
-                asciiImage += '<br>';
+                    const char = asciiChars[asciiIndex] || ' ';
+                    img_line += char;
+
+                    // ASCII 전용 캔버스에 문자 그리기 (숨겨진 canvas)
+                    asciiCtx.fillText(char, i, j);
+                    }
+                asciiImage += img_line + '\n';
             }
 
             // 한 번에 DOM에 반영
-            document.querySelector('#ascii-output').innerHTML = asciiImage;
+            output.innerText = asciiImage;
 
             /*for (let j = 0; j < 300; j += 5){
                 for (let i = 0; i < 300; i += 5){
@@ -65,6 +101,26 @@
             }*/
         });
 
+        // 다운로드 버튼 클릭 시 파일 생성 및 다운로드
+        // TXT 저장 버튼
+        document.getElementById('downloadTxtBtn').addEventListener('click', () => {
+            const blob = new Blob([asciiImage], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ascii-art.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // PNG 저장 버튼
+        document.getElementById('downloadPngBtn').addEventListener('click', () => {
+            const imageURL = asciiCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = imageURL;
+            a.download = 'ascii-art.png';
+            a.click();
+        });
     </script>
 
 </body>
