@@ -83,9 +83,6 @@
         const dropArea = document.getElementById('drop-area');
         const fileInput = document.getElementById('fileInput');
         
-        //const downloadTxtBtn = document.querySelector('downloadTxtBtn');
-        //const downloadPngBtn = document.querySelector('downloadPngBtn');
-
         const scaleInput = document.getElementById('scaleInput');
         const gapInput = document.getElementById('gapInput');
         const fontSizeInput = document.getElementById('fontSizeInput');
@@ -136,8 +133,8 @@
                 const b = imageData[index + 2];
                 const gray = 0.299 * r + 0.587 * g + 0.114 * b;
 
-                const charIndex = Math.floor(gray / (256 / asciiChars.length));
-                const char = asciiChars[charIndex] || ' ';
+                const charIndex = Math.min(asciiChars.length - 1, Math.floor(gray / (256 / asciiChars.length)));
+                const char = asciiChars[charIndex] || ' ';
                 line += char;
 
                 asciiCtx.fillText(char, x, y);
@@ -273,4 +270,3 @@
 
 </body>
 </html>
-
