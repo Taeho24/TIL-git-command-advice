@@ -1,5 +1,6 @@
 # (http://www.data.go.kr)
 # 한국문화관광연구원_출입국관광통계서비스
+# 입국자 수를 json & csv 파일 저장 & 라인차트표시
 
 import os
 import sys
@@ -9,7 +10,11 @@ import time
 import json
 import pandas as pd
 
-ServiceKey = "인증키"
+import matplotlib.pyplot as plt
+import matplotlib
+from matplotlib import font_manager, rc
+
+ServiceKey = "[인증키]"
 
 #[CODE 1]
 def getRequestUrl(url):
@@ -66,14 +71,45 @@ def getTourismStatsService(nat_cd, ed_cd, nStartYear, nEndYear):
                 jsonResult.append({'nat_name': natName, 'nat_cd': nat_cd, 'yyyymm': yyyymm, 'visit_cnt': num})
                 result.append([natName, nat_cd, yyyymm, num])
     return (jsonResult, result, natName, ed, dataEND)
+
+def convert_year(year_input):
+    """한 자리나 두 자리 숫자를1900년대나 2000년대로 보정"""
+    if 0 <= year_input <= 25:
+        return 2000 + year_input
+    if 25 < year_input <= 99:
+        return 1900 + year_input
+    return year_input
+
+def get_valid_year_range():
+    while True:
+        try:
+            nStartYear_raw = int(input('데이터를 몇 년부터 수집할까요? : '))
+            nEndYear_raw = int(input('데이터를 몇 년까지 수집할까요? : '))
+
+            nStartYear = convert_year(nStartYear_raw)
+            nEndYear = convert_year(nEndYear_raw)
+            
+            if nStartYear < 0 or nEndYear < 0:
+                print("error: 연도는 0 이상이어야 합니다.")
+            elif nStartYear > nEndYear:
+                print("error: 시작 연도는 종료 연도보다 작거나 같아야 합니다.")
+            elif nStartYear > 9999 or nEndYear > 9999:
+                print("error: 연도는 9999 이하로 입력해주세요.")
+            else:
+                return nStartYear, nEndYear
+
+        except ValueError:
+            print("error: 숫자만 입력해주세요.")
+
 #[CODE 0]
 def main():
     jsonResult = []
     result = []
     print("<< 국내 입국한 외국인의 통계 데이터를 수집합니다. >>")
     nat_cd = input('국가 코드를 입력하세요(중국: 112 / 일본: 130 / 미국: 275) : ')
-    nStartYear = int(input('데이터를 몇 년부터 수집할까요? : '))
-    nEndYear = int(input('데이터를 몇 년까지 수집할까요? : '))
+    nStartYear, nEndYear = get_valid_year_range()
+    print(f"{nStartYear}년부터 {nEndYear}년까지 데이터를 수집합니다.")
+    
     ed_cd = "E" #E : 방한외래관광객, D : 해외 출국
     jsonResult, result, natName, ed, dataEND = getTourismStatsService(nat_cd, ed_cd, nStartYear, nEndYear) #[CODE 3]
     #파일저장 1 : json 파일
@@ -84,5 +120,36 @@ def main():
     columns = ["입국자국가", "국가코드", "입국연월", "입국자 수"]
     result_df = pd.DataFrame(result, columns = columns)
     result_df.to_csv('./%s_%s_%d_%s.csv' % (natName, ed, nStartYear, dataEND), index=False, encoding='cp949')
+
+    cnVisit = []
+    visitYM = []
+    index = [] # 변수값
+    i = 0
+    for item in jsonResult:
+        index.append(i)
+        cnVisit.append(item['visit_cnt'])
+        visitYM.append(item['yyyymm'])
+        i += 1
+    
+    try:
+    # 말굽폰트가 있는 경우
+        font_path = 'c:/windows/fonts/malgun.ttf'
+        font_name = font_manager.FontProperties(fname=font_path).get_name()
+        matplotlib.rc('font', family=font_name)
+        print(f"폰트 설정 완료: {font_name}")
+    except Exception as e:
+        print(f"한글 폰트를 설정할 수 없습니다. 기본 폰트를 사용합니다.\n{e}")
+        matplotlib.rc('font', family='sans-serif')  # 대체 폰트 설정
+
+    plt.xticks(index, visitYM, rotation=90) # x 변수값
+    plt.plot(index, cnVisit, label=natName, color='blue', marker='o') # y 변수값
+    plt.xlabel('입국연월') # x 변수명
+    plt.ylabel('입국자 수') # y 변수명
+    plt.title('입국연월별 국가별 입국자 수')
+    plt.legend(loc='upper left')
+    plt.grid(True)
+    plt.tight_layout()  # 레이아웃 깨짐 방지
+    plt.show()
+
 if __name__ == '__main__':
     main()
