@@ -208,7 +208,9 @@
         };
 
         currentImg.onerror = () => {
-            alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
+            if (!currentImg.src) {
+                    alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
+            }
         };
 
         generateBtn.addEventListener('click', () => {
