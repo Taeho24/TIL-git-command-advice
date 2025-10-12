@@ -44,7 +44,7 @@ ascii-art-generator/
 
 ## 📄 라이선스
 
-이 프로젝트는 [MIT License](LICENSE)를 따릅니다.
+이 프로젝트는 [MIT License](https://github.com/Taeho24/ASCII_ART_Generator/blob/main/LICENSE)를 따릅니다.
 
 원본 라이브러리 gifuct-js는 [MIT](https://github.com/matt-way/gifuct-js/blob/master/LICENSE) 라이선스를 따릅니다.
 
