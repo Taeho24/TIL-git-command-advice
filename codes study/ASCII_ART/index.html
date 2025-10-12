@@ -38,6 +38,7 @@
       text-align: center;      /* 텍스트가 여러 줄일 때 가운데 정렬 */
     }
     </style>
+
 </head>
 <body>
     <h2>🎨 ASCII Art Generator</h2>
@@ -51,11 +52,10 @@
         <button id="generateBtn" style="margin-left:15px;">다시 생성</button>
     </div>
 
-    <div id="drop-area">
-        이미지를 드래그하여 여기에 놓거나, 아래 버튼으로 업로드하세요.
-    </div>
     <input type="file" id="fileInput" accept="image/*">
-
+    <pre id="drop-area">
+        이미지를 드래그하여 여기에 놓거나, 아래 버튼으로 업로드하세요.
+    </pre>
     <canvas id="canvas"></canvas>
     <canvas id="ascii-canvas" style="display:none;"></canvas>
     <h4 id="ascii-output"> </h4>
@@ -68,18 +68,10 @@
         </label>
     </div>
 
-    <script>
-        let img =new Image()
-        img.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
-        img.src = 'free-icon-transform-text.png' // 기본 이미지
-
-        // 이미지 로드 성공 시 ASCII 변환 함수 호출
-        img.addEventListener('load', () => generateASCIIFromImage(img));
-
-        // 이미지 로드 실패 시 알림
-        img.addEventListener('error', () => {
-            alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
-        });
+    <!-- gifuct-js 라이브러리 로드 -->
+    <script type="module">
+        // gifuct 객체에서 함수 꺼내기
+        import { parseGIF, decompressFrames } from 'https://cdn.jsdelivr.net/npm/gifuct-js/+esm';
 
         const canvas = document.querySelector('canvas')
         const ctx = canvas.getContext('2d')
@@ -97,7 +89,18 @@
         const asciiInput = document.getElementById('asciiInput');
         const generateBtn = document.getElementById('generateBtn');
 
-        let asciiImage = '';
+        const transparentBgCheckbox = document.getElementById('transparentBgCheckbox');
+        const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+        const downloadPngBtn = document.getElementById('downloadPngBtn');
+
+        let asciiImage = '';        
+        let currentImg = new Image();
+        currentImg.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
+        currentImg.src = 'src/img/free-icon-transform-text.png';
+
+        let animationFrames = null;
+        let animationIndex = 0;
+        let animationTimer = null;
 
         function getCharSafe(chars, index, defaultChar = ' ') {
             return (index >= 0 && index < chars.length) ? chars[index] : defaultChar;
@@ -125,6 +128,7 @@
                 alert('ASCII 문자셋은 최소 2개 이상 입력하세요.');
                 return;
             }
+
             const width = Math.max(1, Math.floor(sourceImage.width * scale));
             const height = Math.max(1, Math.floor(sourceImage.height * scale));
 
@@ -169,10 +173,52 @@
             output.innerText = asciiImage;
         }
 
-        // 초기 이미지 로드 시
-        img.addEventListener('load', () => generateASCIIFromImage(img));
-        generateBtn.addEventListener('click', () => generateASCIIFromImage(img));
-        
+        // GIF 애니메이션 ASCII 변환 함수 (프레임 이미지 받아서 ASCII 변환)
+        function drawFrameAndGenerateASCII(canvasFrame) {
+            generateASCIIFromImage(canvasFrame);
+        }
+
+        function animateGIF(frames, width, height) {
+            if (animationTimer) clearTimeout(animationTimer);
+
+            const frame = frames[animationIndex];
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            const tempCtx = tempCanvas.getContext('2d');
+
+            // 프레임 이미지 데이터 생성
+            const imageData = tempCtx.createImageData(frame.dims.width, frame.dims.height);
+            imageData.data.set(frame.patch);
+            tempCtx.putImageData(imageData, frame.dims.left, frame.dims.top);
+
+            // 완성된 캔버스를 이용해 ASCII 변환
+            drawFrameAndGenerateASCII(tempCanvas);
+
+            animationIndex = (animationIndex + 1) % frames.length;
+
+            // delay가 0이면 기본 100ms로 처리
+            const delay = frame.delay > 0 ? frame.delay * 10 : 100;
+            animationTimer = setTimeout(() => animateGIF(frames, width, height), delay);
+        }
+
+        // 이미지 로드 이벤트
+        currentImg.onload = () => {
+            generateASCIIFromImage(currentImg);
+        };
+
+        currentImg.onerror = () => {
+            alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
+        };
+
+        generateBtn.addEventListener('click', () => {
+            if (animationFrames) {
+                // GIF 애니메이션 중이면 재생 유지
+                animateGIF(animationFrames, canvas.width, canvas.height);
+            } else {
+                generateASCIIFromImage(currentImg);
+            }
+        });
         // 원본 코드
         /*img.addEventListener('load', function(){
             ctx.drawImage(img, 0, 0)
@@ -188,6 +234,51 @@
                 }
             }
         })*/
+
+        function handleFile(file) {
+            console.log("handleFile called, file:", file);
+            if (!file || !file.type.startsWith('image/')) {
+                alert('이미지 파일만 가능합니다.');
+                return;
+            }
+
+            const reader = new FileReader();
+
+            // GIF 처리
+            if (file.type === 'image/gif') {
+                reader.onload = e => {
+                    const buffer = e.target.result;
+                    const gif = parseGIF(buffer);
+                    const frames = decompressFrames(gif, true);
+
+                    // 전체 캔버스 크기 - GIF 전체 크기 기준
+                    const gifWidth = gif.lsd.width;
+                    const gifHeight = gif.lsd.height;
+
+                    animationFrames = frames;
+                    animationIndex = 0;
+
+                    // 애니메이션 시작
+                    animateGIF(animationFrames, gifWidth, gifHeight);
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                // 일반 이미지
+                reader.onload = e => {
+                    if (animationTimer) clearTimeout(animationTimer);
+                    animationFrames = null;
+                    animationIndex = 0;
+
+                    const newImg = new Image();
+                    newImg.onload = () => {
+                        currentImg = newImg;
+                        generateASCIIFromImage(currentImg);
+                    };
+                    newImg.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
 
         // 드래그 앤 드롭 기능 추가
         dropArea.addEventListener('dragover', e => {
@@ -211,27 +302,9 @@
             handleFile(file);
         });
 
-        function handleFile(file) {
-            if (!file || !file.type.startsWith('image/')) {
-                alert('이미지 파일만 가능합니다.');
-                return;
-        }
-
-        const reader = new FileReader();
-            reader.onload = e => {
-                const newImg = new Image();
-                newImg.onload = () => {
-                img = newImg;
-                generateASCIIFromImage(img);
-                };
-                newImg.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
         // 다운로드 버튼 클릭 시 파일 생성 및 다운로드
         // TXT 저장 버튼
-        document.getElementById('downloadTxtBtn').addEventListener('click', () => {
+        downloadTxtBtn.addEventListener('click', () => {
             let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
             if (!fileName) return;
             
@@ -253,7 +326,7 @@
             URL.revokeObjectURL(url);
         });
         // PNG 저장 버튼
-        document.getElementById('downloadPngBtn').addEventListener('click', () => {
+        downloadPngBtn.addEventListener('click', () => {
             let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
             if (!fileName) return;
             // 파일명 안전 처리
@@ -261,7 +334,7 @@
 
             if (!fileName.toLowerCase().endsWith('.png')) fileName += '.png';
             
-            const isTransparent = document.getElementById('transparentBgCheckbox').checked;
+            const isTransparent = transparentBgCheckbox.checked;
 
             // 임시 캔버스 생성
             const tempCanvas = document.createElement('canvas');
