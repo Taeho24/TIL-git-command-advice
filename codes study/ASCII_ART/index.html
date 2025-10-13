@@ -304,6 +304,12 @@
             handleFile(file);
         });
 
+        // dropArea 클릭 시 fileInput 클릭
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+
         // 다운로드 버튼 클릭 시 파일 생성 및 다운로드
         // TXT 저장 버튼
         downloadTxtBtn.addEventListener('click', () => {
