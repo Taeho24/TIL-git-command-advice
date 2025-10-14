@@ -46,7 +46,7 @@
     <div style="margin:10px;">
         <label>이미지 크기 비율: <input id="scaleInput" type="number" min="0.1" max="1" step="0.1" value="1" style="width:50px;"> (0.1~1)</label>
         <label title="픽셀 간격이 너무 작으면 이미지가 너무 길어짐. 적당히 조절하세요."style="margin-left:15px;">변환 픽셀 간격(px): <input id="gapInput" type="number" min="1" max="20" step="1" value="5" style="width:50px;"></label>
-        <label style="margin-left:15px;">폰트 크기(px): <input id="fontSizeInput" type="number" min="2" max="20" step="1" value="6" style="width:50px;"></label>
+        <label style="margin-left:15px;">폰트 크기(px): <input id="fontSizeInput" type="number" min="2" max="20" step="1" value="5" style="width:50px;"></label>
         <br><br>
         <label>ASCII 문자셋: <input id="asciiInput" type="text" value="@$#Y!=+~- " style="width:200px;"></label>
         <button id="generateBtn" style="margin-left:15px;">다시 생성</button>
@@ -65,6 +65,15 @@
         <label>
             <input type="checkbox" id="transparentBgCheckbox" title="체크 해제 시 배경이 흰색으로 채워짐" checked>
                 배경 투명
+        </label>
+        <label style="margin-left:15px;">
+            저장 이미지(.png) 선명도:
+            <select id="resolutionSelect">
+                <option value="1">1x</option>
+                <option value="2" selected>2x</option>
+                <option value="4">4x</option>
+                <option value="8">8x</option>
+            </select>
         </label>
     </div>
 
@@ -96,7 +105,7 @@
         let asciiImage = '';        
         let currentImg = new Image();
         currentImg.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
-        currentImg.src = 'src/img/free-icon-transform-text.png';
+        currentImg.src = ''; // # (선택사항)
 
         let animationFrames = null;
         let animationIndex = 0;
@@ -129,8 +138,8 @@
                 return;
             }
 
-            const width = Math.max(1, Math.floor(sourceImage.width * scale));
-            const height = Math.max(1, Math.floor(sourceImage.height * scale));
+            const width = Math.floor(sourceImage.width * scale);
+            const height = Math.floor(sourceImage.height * scale);
 
             // 크기에 맞춰 캔버스 크기 조정
             canvas.width = asciiCanvas.width = width;
@@ -209,9 +218,10 @@
 
         currentImg.onerror = () => {
             if (!currentImg.src) {
-                    alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
+                alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
             }
         };
+
 
         generateBtn.addEventListener('click', () => {
             if (animationFrames) {
@@ -221,21 +231,6 @@
                 generateASCIIFromImage(currentImg);
             }
         });
-        // 원본 코드
-        /*img.addEventListener('load', function(){
-            ctx.drawImage(img, 0, 0)
-            for (let j = 0; j < 300; j += 5){
-                for (let i = 0; i < 300; i += 5){
-                    let pixel = ctx.getImageData(i, j, 1, 1).data
-                    let gray = 0.299*pixel[0] + 0.587*pixel[1] + 0.114*pixel[2]
-                    let index = Math.floor(gray/25.6)
-                    document.querySelector('h4').innerText += ascii[index]
-                    if (i >= 295) {
-                        document.querySelector('h4').innerHTML += '<br>'
-                    }
-                }
-            }
-        })*/
 
         function handleFile(file) {
             console.log("handleFile called, file:", file);
@@ -335,21 +330,27 @@
         });
         // PNG 저장 버튼
         downloadPngBtn.addEventListener('click', () => {
-            let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
-            if (!fileName) return;
-            // 파일명 안전 처리
-            fileName = fileName.replace(/[\\/:*?"<>|]/g, '_');
+            const baseFontSize = parseInt(fontSizeInput.value);
+            const baseGap = parseInt(gapInput.value);
+            const lines = asciiImage.trim().split('\n');
+            const cols = lines[0]?.length || 0;
 
-            if (!fileName.toLowerCase().endsWith('.png')) fileName += '.png';
-            
-            const isTransparent = transparentBgCheckbox.checked;
+            const resolutionSelect = document.getElementById('resolutionSelect');
+            const scaleFactor = parseInt(resolutionSelect.value);
 
-            // 임시 캔버스 생성
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = asciiCanvas.width;
-            tempCanvas.height = asciiCanvas.height;
 
+            const fontSize = baseFontSize * scaleFactor;
+            const gap = baseGap * scaleFactor;
+            const width = cols * gap * scaleFactor;
+            const height = lines.length * gap * scaleFactor;
+
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            
+            const isTransparent = transparentBgCheckbox.checked;
+            
             if (!isTransparent) {
                 // 배경 흰색 채우기
                 tempCtx.fillStyle = 'white';
@@ -359,8 +360,24 @@
                 tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
             }
 
-            // asciiCanvas 그림 복사
-            tempCtx.drawImage(asciiCanvas, 0, 0);
+            tempCtx.fillStyle = 'black';
+            tempCtx.font = `${fontSize}px Consolas, monospace`;
+            tempCtx.textBaseline = 'top';
+            tempCtx.textAlign = 'left'; // 명시목적
+
+            lines.forEach((line, rowIndex) => {
+                for (let col = 0; col < line.length; col++) {
+                const char = line[col];
+                tempCtx.fillText(char, col * gap * scaleFactor, rowIndex * gap * scaleFactor);
+                }
+            });
+
+            let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
+            if (!fileName) return;
+            // 파일명 안전 처리
+            fileName = fileName.replace(/[\\/:*?"<>|]/g, '_');
+
+            if (!fileName.toLowerCase().endsWith('.png')) fileName += '.png';
 
             // Blob으로 변환 후 다운로드
             tempCanvas.toBlob(blob => {
