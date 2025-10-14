@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 import urllib.request
 import pandas as pd
-import datetime
+# import datetime
+
 #[CODE 1]
 def hollys_store(result):
     # pageNo=1~47 crawling

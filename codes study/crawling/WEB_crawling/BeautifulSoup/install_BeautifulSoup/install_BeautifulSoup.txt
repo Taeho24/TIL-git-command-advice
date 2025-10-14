@@ -33,5 +33,7 @@ You should consider upgrading via the `C`:\Users\~\anaconda3\python.exe -m pip i
 - (주의) 경로는 자신의 설치환경(python) 버전에 따라 달라질 수 있음
 
 --- 
-# 
+# BeautifulSoup 라이브러리의 단점
+- 정적 웹 페이지에서 크롤링하는 것은 가능
+- JavaScript를 이용하여 함수를 호출하고 데이터를 처리하는 구조를 가진 동적 웹 페이지의 크롤링에 부적합
 
