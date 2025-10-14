@@ -31,3 +31,7 @@ You should consider upgrading via the `C`:\Users\~\anaconda3\python.exe -m pip i
  C:\Users\~\AppData\Local\Programs\Python\Python313\Scripts > pip install beautifulsoup4
 ```
 - (주의) 경로는 자신의 설치환경(python) 버전에 따라 달라질 수 있음
+
+--- 
+# 
+
