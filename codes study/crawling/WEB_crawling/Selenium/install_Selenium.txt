@@ -1,0 +1,44 @@
+# 동적 웹 페이지 크롤링 개요
+- 셀레늄은 웹 애플리케이션 테스트를 위한 포터블 프레임워크
+    - 셀레늄은 테스트 스크립트 언어를 학습할 필요 없이 기능 테스트를 만들기 위한 플레이백 도구를 제공
+- C#, 그루비, 자바, 펄, PHP, 파이썬, 루비, 스칼라 등 수많은 유명 프로그래밍 언어들에서 테스트를 작성하기 위한 테스트 도메인 특화 언어(Selenese)를 제공
+- 아파치 2.0라이선스로 배포되는 오픈소스 소프트웨어
+
+--- 
+# Selenium 라이브러리를 사용하기 위해 추가 설치작업을 실시:
+**(Python IDLE 환경에서 실행 추천)**
+
+## 명령 프롬프트 창에서 pip 명령을 사용
+`pip install selenium`
+
+## Selenium 라이브러리의 WebDriver를 임포트
+`>>> from selenium import webdriver`
+
+## 크롬 WebDriver 객체를 생성
+`>>> wd = webdriver.Chrome()`
+    1. 보안 경고가 뜨면 액세스 허용을 함
+    2. WebDriver를 설치한 경로를 지정하여 크롬 WebDriver 객체를 생성하면 크롬WebDriver가 실행
+        - `(URL: data;,) Chrome이 자동화된 테스트 소프트웨어에 의해 제어되고 있습니다.` 문구 표시
+        - ! 로딩시 다소 시간이 걸릴 수 있음
+
+## 파이썬 셸 창에서 다음과 같이 입력하여 Selenium이 제어하는 크롬창에서 웹 페이지를 열어 확인
+`>>> wd.get("https://www.coffeebeankorea.com/store/store.asp")` : 예제코드-`coffebeankorea.com` 의 경우
+
+### 웹 페이지 분석하기
+1. URL 접속
+2. 자바스크립트의 함수 확인 (`Crtl + U`의 정적페이지에서 확인 못하는 정보)
+
+
+## 자바스크립트 함수 호출해 정보 페이지 열기
+예제`>>> wd.execute_script("storePop2(3)")`
+
+## 자바스크립트 함수가 수행된 페이지의 소스 코드를 저장
+`>>> html = wd.page_source`
+
+## BeautifulSoup 객체를 생성
+`>>> soupCB1 = BeautifulSoup(html, 'html.parser')`
+
+## HTML 소스 코드 형태로 출력하여 확인
+`>>> print(soupCB1.prettify())`
+
+---
