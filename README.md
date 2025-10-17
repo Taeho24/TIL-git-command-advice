@@ -4,7 +4,7 @@
 
 각 프로젝트 중 사용 command 정리
 
-
+---
 <details> <summary>📁 폴더 구조</summary>
 
 ```markdown
@@ -19,6 +19,7 @@ TIL-git-command-advice/
 │   │   ├── API_crawling/
 │   │   │   ├── NAVER_crawling/
 │   │   │   └── public_infor_crawling/
+│   │   │       └── tourismStats.py
 │   │   └── WEB_crawling/
 │   │       ├── robots_check.txt
 │   │       ├── BeautifulSoup/
@@ -26,11 +27,13 @@ TIL-git-command-advice/
 │   │       │   └── hollysCrawler.py
 │   │       └── Selenium/
 │   │           ├── install_Selenium.txt
-│   │           └── CoffeeBeanCrawler.py
+│   │           ├── CoffeeBeanCrawler.py
+│   │           └── LotteeatzCrawler.py
 │   ├── Buffer_inputLimit/
 │   ├── Mono-Alphabetic Substitution Cipher/
 │   ├── Sorting_Algorithm/
-│   └── Ubuntu_Ccode_study/
+│   ├── Ubuntu_Ccode_study/
+│   └── Statistical_Prediction/
 └─── commands/
     ├── venv activate.txt
     ├── Django start command/
@@ -51,4 +54,3 @@ TIL-git-command-advice/
         └── reference.txt
 ```
 </details>
-
