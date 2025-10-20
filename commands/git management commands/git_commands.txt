@@ -157,5 +157,7 @@ https://git-school.github.io/visualizing-git/
 `git stash drop` // 최근 임시저장 내용 삭제
 `git stash pop` // 임시저장 내용 불러오기(apply + drop)
 
+`git stash clear` // 모든 임시저장 내용 삭제
+
 // 특정 branch만 clone 하는 command
 `git clone -b {branch_name} --single-branch {저장소 URL}`
