@@ -51,6 +51,6 @@ TIL-git-command-advice/
     └── git management commands/
         ├── git_setting.txt
         ├── gitignore_setting.txt
-        └── reference.txt
+        └── git_commands.txt
 ```
 </details>
