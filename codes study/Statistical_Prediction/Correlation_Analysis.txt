@@ -1,0 +1,151 @@
+# 상관 분석(correlation analysis)
+- 두 변수가 어떤 선형적 관계에 있는지를 분석하는 방법
+- 두 변수는 서로 독립적이거나 상관된 관계일 수 있는데, 두 변수의 관계의 강도를 상관관계 라고함
+- 상관 분석에서는 상관관계의 정도를 나타내는 단위로 모상관 계수 ρ를 사용
+- 상관 계수(correlation coefficient)는 두 변수가 연관된 정도를 나타낼 뿐 인과 관계를 설명하지 않으므로 정확한 예측치를 계산할 수는 없음
+
+## 단순 상관 분석(simple correlation analysis)
+- 두 변수가 어느 정도 강한 관계에 있는지 측정
+
+## 다중 상관 분석(multiple correlation analysis)
+- 세 개 이상의 변수 간 관계의 강도를 측정
+- 편상관 분석: 다른 변수와의 관계를 고정하고 두 변수 간 관계의 강도를 나타내는 것
+
+## 상관 계수 ρ
+- 변수 간 관계의 정도(0~1)와 방향(+, -)을 하나의 수치로 요약해주는 지수로 -1에서 +1 사이의 값을 가짐
+    - 상관 계수가 +이면 양의 상관관계이며 한 변수가 증가하면 다른 변수도 증가
+    - 상관 계수가 –이면 음의 상관관계이며 한 변수가 증가할 때 다른 변수는 감소
+
+- 상관 계수에 대한 해석 방법(분야 및 경우에 따라 다름)
+    - 0.0 ~ 0.2: 상관관계가 거의 없음
+    - 0.2 ~ 0.4: 약한 상관관계가 있음
+    - 0.4 ~ 0.6: 상관관계가 있음
+    - 0.6 ~ 0.8: 강한 상관관계가 있음
+    - 0.8 ~ 1.0: 매우 강한 상관관계가 있음
+    - (선형에 가까울수록 강한 상관관계, 기울기 상관X)
+
+## 피어슨 상관 계수(Pearson Correlation Coefficient)
+- 두 변수가 서로 (선형)상관관계를 가지는지 확인하는 척도
+    - 두 확률변수의 곱의 기댓값은 각 확률변수들의 평균(mean)과 편차(deviation)를 통해서 구할 수 있음
+
+
+# 데이터 수집
+```
+>>> import seaborn as sns
+>>> import pandas as pd
+>>> titanic = sns.load_dataset("titanic")
+>>> titanic.to_csv('C:/Users/testDataSet/titanic.csv', index = False)
+```
+## 데이터 준비
+```누락 값 채우기
+>>> titanic.isnull().sum() # 누락 값 확인
+>>> titanic['age'] = titanic['age'].fillna(titanic['age'].median())
+>>> titanic['embarked'].value_counts()
+>>> titanic['embark_town'] = titanic['embark_town'].fillna('Southampton')
+>>> titanic['deck'].value_counts()
+>>> titanic['deck'] = titanic['deck'].fillna('C')
+>>> titanic.isnull().sum() # 누락 값 확인
+>>> titanic['embarked'].value_counts()
+>>> titanic['embarked']=titanic['embarked'].fillna('S')
+>>> titanic['embark_town'].value_counts()
+>>> titanic['embark_town'] = titanic['embark_town'].fillna('Southampton')
+>>> titanic['deck'].value_counts()
+>>> titanic['deck'] = titanic['deck'].fillna('C')
+>>> titanic.isnull().sum() # 누락 값 확인
+```
+
+## 데이터 탐색
+1. 데이터의 기본 정보 탐색
+```
+>>> titanic.info()
+>>> titanic.survived.value_counts()
+```
+
+2. 차트를 그려 데이터를 시각적으로 탐색하기
+```
+>>> import matplotlib.pyplot as plt
+>>> f, ax = plt.subplots(1, 2, figsize = (10, 5)) # `1, 2,`는 행렬의 수
+>>> titanic['survived'][titanic['sex'] == 'male'].value_counts().plot.pie(explode = [0,0.1], autopct = '%1.1f%%', ax = ax[0], shadow = True)
+    # <Axes: ylabel='count’>
+>>> titanic['survived'][titanic['sex'] == 'female'].value_counts().plot.pie(explode = [0,0.1], autopct = '%1.1f%%', ax = ax[1], shadow = True)
+    # <Axes: ylabel='count’>
+>>> ax[0].set_title('Survived (Male)')
+    # Text(0.5, 1.0, 'Survived (Male)')
+>>> ax[1].set_title('Survived (Female)')
+    # Text(0.5, 1.0, 'Survived (Female)')
+>>> plt.show()
+```
+
+3. 등급별 생존자 수를 차트로 나타내기
+```
+>>> sns.countplot(x='pclass', hue = 'survived', data = titanic) # `hue`는 종속 변수를 지정
+    # <AxesSubplot:xlabel='pclass', ylabel='count’>
+>>> plt.title('Pclass vs Survived')
+    # Text(0.5, 1.0, 'Pclass vs Survived')
+>>> plt.show()
+```
+
+### 데이터 모델링
+1. 상관 분석을 위한 상관 계수 구하고 저장하기
+```
+>>> titanic_new = titanic[['survived', 'pclass','age', 'sibsp', 'parch', 'fare', 'adult_male', 'alone']]
+    # !주의 데이터타입이 int64, float64, boolean 인 것들만 상관 관계 분석 가능
+
+>>> titanic_corr = titanic_new.corr(method = 'pearson')
+>>> titanic_corr # 확인하기
+```
+
+2. 특정 변수 사이의 상관 계수를 구하기
+```
+>>> titanic['survived'].corr(titanic['adult_male’])
+# np.float64(0.2573065223849622)
+>>> titanic['survived'].corr(titanic['fare’])
+# np.float64(0.2573065223849622)
+```
+
+### 결과 시각화
+1. 삼점도로 상관 분석 시각화하기
+```
+>>> sns.pairplot(titanic, hue = 'survived')
+    # <seaborn.axisgrid.PairGrid object at 0x000001710D852A58>
+02 >>> plt.show()
+```
+
+2. 두 변수의 상관관계 시각화하기
+```
+>>> sns.catplot(x = 'pclass', y = 'survived', hue = 'sex', data = titanic, kind = 'point')
+    # <seaborn.axisgrid.FacetGrid object at 0x00000274172AD310>
+>>> plt.show()
+```
+
+3. 변수 상이의 상관 계수를 히트맵으로 시각화 하기
+```
+>>> def category_age(x):
+    if x < 10:
+        return 0
+    elif x < 20:
+        return 1
+    elif x < 30:
+        return 2
+    elif x < 40:
+        return 3
+    elif x < 50:
+        return 4
+    elif x < 60:
+        return 5
+    elif x < 70:
+        return 6
+    else:
+        return 7
+>>> titanic['age2'] = titanic['age'].apply(category_age)
+>>> titanic['sex'] = titanic['sex'].map({'male':1, 'female':0})
+>>> titanic['family'] = titanic['sibsp'] + titanic['parch'] + 1
+>>> titanic.to_csv('C:/Users/BongjaeKim/My_Python/7장_data/titanic3.csv', index = False)
+>>> heatmap_data = titanic[['survived', 'sex', 'age2', 'family', 'pclass', 'fare']]
+>>> colormap = plt.cm.RdBu
+>>> sns.heatmap(heatmap_data.astype(float).corr(), linewidths = 0.1, vmax = 1.0, square = True, cmap = colormap,
+ linecolor = 'white', annot = True, annot_kws = {"size": 10})
+    # <matplotlib.axes._subplots.AxesSubplot object at 0x000001DD4C8DBF88>
+
+>>> plt.show()
+```

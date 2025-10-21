@@ -1,0 +1,231 @@
+# 기술 통계(description statistics)/요약 통계(summary statistics)
+- 데이터의 특성을 나타내는 수치를 이용하여 분석하는 기본적인 통계 방법
+    - 평균(average), 중앙값(median), 최빈값(mode) 등이 대표적
+
+# 회귀 분석(regression analysis)
+- 독립 변수(independent variable), x와 종속변수(dependent variable), y간의 상호 연관성 정도를 파악하기 위한 분석 기법
+    - 즉, 하나의 변수가 변함에 따라 대응 되는 변수가 어떻게 변하는지를 측정하고 분석하는 것
+    - 변수 값의 인과 관계(casual relation)를 분석할 때 많이 사용
+- 독립 변수가 한 개이면 단순 회귀 분석(simple regression analysis), 두 개이상이면 다중 회귀 분석(multiple regression analysis)
+- 독립 변수와 종속 변수의 관계에 따라 선형 회귀 분석(linear regression)과 비선형 회귀 분석(non-linear regression)으로 구분
+    - 선형 회귀 분석 식: y = b0 + b1x1 + b2x2 + … + bnxn
+
+## 선형 회귀 (Linear Regression)
+정의: 선형 회귀는 독립 변수와 종속 변수 간의 선형 관계를 가정하는 회귀 방법
+    - 종속 변수는 독립 변수의 선형 결합으로 표현
+
+## 비선형 회귀 (Nonlinear Regression)
+정의: 비선형 회귀는 독립 변수와 종속 변수 간의 관계가 선형이 아닌 경우 사용하는 방법
+    - 종속 변수는 독립 변수의 복잡한 함수로 나타날 수 있음
+        - 지수, 로그, 다항식 등 비선형적인 함수 형태를 포함
+
+# 정규방정식
+- 통계학에서선형회귀상에서알지못하는값(parameter)를예측하기위한방법론
+    - 정규방정식은 행렬 연산에 기반하기 때문에 피쳐의 개수가 엄청나게 많을 경우 연산이 느려지는 단점이 있음
+    - '경사 하강법'은 아무리 많은 피쳐가 존재하더라도 일정한 시간 내에 해법을 찾는 것이 가능
+- 장점
+    - 정규방정식은 수학적으로 한 번에 해를 구할 수 있는 방식이므로 계산이 간편
+    - 경사하강법과 같은 반복적 최적화 알고리즘을 사용할 필요가 없기 때문에 코드 구현이 단순
+- 단점
+    - 역행렬 계산의 비용
+    - 대규모 데이터셋에서는 비효율적
+- [자세한 내용](https://en.wikipedia.org/wiki/Ordinary_least_squares)
+
+
+# 데이터 제공 링크
+- https://archive.ics.uci.edu/dataset/186/wine+quality
+    - 캘리포니아 어바인 대학의 머신러닝 저장소에서 제공하는 오픈 데이터를 사용
+    » 실제 다운로드 링크: https://archive.ics.uci.edu/dataset/186/wine+quality
+    » 레드와인 데이터: winequality-red.csv
+    » 화이트와이 데이터: winequality-white.csv
+    - 다운로드한 파일은 testDataSet 폴더를 만든 후에 저장
+        `winequality-red.csv & winequality-white.csv 파일`
+
+## 1. 다운로드한 CSV 파일 정리하기
+– 엑셀은 CSV 파일을 열 때 쉼표(,)를 열 구분자로 사용하므로 열이 깨진 것처럼 보임
+– 엑셀에서 세미콜론(;)을 열 구분자 로 인식하도록 파일을 다시 저장해야 함
+
+1. 엑셀에서 열 구분자를 세미콜론으로 인식시키기
+``` python 코드에서 csv 파일이 위치한 경로
+>>> import pandas as pd
+>>> red_df = pd.read_csv('C:/Users/testDataSet/winequality-red.csv', sep = ';', header = 0, engine = 'python')
+>>> white_df = pd.read_csv('C:/Users/testDataSet/winequality-white.csv', sep = ';', header = 0, engine= 'python')
+>>> red_df.to_csv('C:/Users/testDataSet/winequality-red2.csv', index = False)
+>>> white_df.to_csv('C:/Users/testDataSet/winequality-white2.csv', index = False)
+```
+
+2. 파이썬에서 저장한 CSV 파일을 엑셀에서 열어 상태를 확인
+
+## 2. 데이터 병합하기
+1. 레드 와인과 화이트 와인 파일 합치기
+```
+>>> red_df.head() # 확인하기
+>>> red_df.insert(0, column = 'type', value = 'red')
+>>> red_df.head() # 확인하기
+>>> red_df.shape # column 확인 # (1599, 13)
+
+>>> white_df.head() # 확인하기
+>>> white_df.insert(0, column = 'type', value = 'white')
+>>> white_df.head() # 확인하기
+>>> white_df.shape # column 확인 # (4898, 13)
+
+>>> wine = pd.concat([red_df, white_df])
+>>> wine.shape
+>>> wine.to_csv('C:/Users/testDataSet/wine.csv', index = False)
+```
+
+2. 결합된 파일 확인하기
+
+## 3. 기본 정보 확인하기
+```
+>>> print(wine.info())
+```
+
+## 4. 함수를 사용해 기술 통계 구하기
+```
+>>> wine.columns = wine.columns.str.replace(' ', '_')
+>>> wine.head() # 확인하기
+
+>>> wine.describe()
+
+>>> sorted(wine.quality.unique()) # 리스트 형태로 유일한 값을 출력 []
+>>> wine.quality.value_counts() # 빈도수를 출력
+```
+
+## 5. 데이터 모델링
+1. describe()함수로 그룹 비교하기
+```
+>>> wine.groupby('type')['quality'].describe()
+>>> wine.groupby('type')['quality'].mean()
+>>> wine.groupby('type')['quality'].std()
+>>> wine.groupby('type')['quality'].agg(['mean', 'std'])
+```
+
+2. t-검정과 회귀 분석으로 그룹 비교하기
+- t-검정을 위해서는 "scipy 라이브러리 패키지"를 사용
+- 회귀 분석을 위해서는 "statsmodels 라이브러리 패키지"를 사용
+- 명령 프롬프트 창에서 다음과 같이 입력하여 statsmodels 패키지를 설치
+`pip install statsmodels`
+
+» !주의 Statsmodels is a Python module that provides classes and functions for the estimation of many different statistical models, as well as for conducting statistical tests and statistical data exploration
+
+
+```
+>>> from scipy import stats
+>>> from statsmodels.formula.api import ols, glm
+>>> red_wine_quality = wine.loc[wine['type'] == 'red', 'quality']
+>>> white_wine_quality = wine.loc[wine['type'] == 'white', 'quality']
+    # loc =  행/열의 이름(레이블) 기준으로 데이터 읽기
+    # iloc = 행/열의 순서(0, 1, 2...) 번호를 기준으로 데이터 읽기
+>>> stats.ttest_ind(red_wine_quality, white_wine_quality, equal_var = False)
+    # TtestResult(statistic=np.float64(-10.149363059143164), pvalue=np.float64(8.168348870049682e-24), df=np.float64(2950.750452166697))
+    # Ttest의 값은 "두 값의 차이"이기 때문에 절댓값이 중요!
+>>> Rformula = 'quality ~ fixed_acidity + volatile_acidity + citric_acid + residual_sugar + chlorides + free_sulfur_dioxide + total_sulfur_dioxide + density + pH + sulphates + alcohol'
+    # quality 뒤의 `~` 은 `=` 와 같은 의미
+>>> regression_result = ols(Rformula, data = wine).fit()
+```
+```
+>>> regression_result.summary()
+    # No. Observations: # 회귀분석 데이터의 전체 수
+    # Df Residuals      # 전체 관찰데이터의 수에서 회귀모형의 전체 파라미터의 수를 뺀 값
+            # "No. Observations – (Df Model + 1)"
+    # Df Model          # 설명 변수(독립 변수)의 개수
+            # "회귀분석 전체 파라미터 숫자 - 1"
+    # R-squared         # 결정계수, 전체 데이터 중 해당 회귀모델이 설명할 수 있는 데이터의 비율, 회귀식의 설명력을 의미
+            # 1에 가까울수록 성능이 좋음
+        # 단점: "독립변수가 증가할 R-square"는 같거나 항상 증가함
+            # 과적합 문제 등의 발생 가능
+    # F-statistics (F-통계량)   # 모델의 모든 독립 변수가 종속 변수에 대해 통계적으로 유의미한 설명력을 가지는지를 판단
+            # 즉, F 통계량으로 도출된 회귀식이 적절한지 확인 가능(크면 클수록 유의미하다는 의미)
+        # 단점: 개별 변수의 유의미성을 판단하기 어려움
+    # Prob(F-statistics)    # 회귀식이 유의미한지 판단
+        # 0.05이하일 경우 변수 끼리 매우 있음을 의미
+        # F-통계량이 크면 Prob(F-statistic)은 작아지고, 이는 모델이 유의미할 가능성이 높다는 것을 의미
+    # coef(coefficient, 계수)   # 회귀계수 [error(오류) vs residual(잔차)]
+    # std err           # 계수 추정치의 표준오차(standard error), 값이 작을 수록 좋음 
+    # P>|t| : 유의확률(p-value) # 독립변수의 유의확률
+        # 독립변수의 유의확률이 0.05보다 작으면, 독립변수가 종속변수에 영향을 미치는 것이 유의미(개별 독립변수에 초점을 둠)
+    # t                 # T-test, 독립변수와 종속변수 사이의 상관관계
+        # 값이 클 수록 상관도가 큼
+    # [0.025 0.975]     # 회귀 계수의 신뢰구간
+        # 신뢰구간이 좁을수록 회귀 계수의 추정치가 더 정밀
+    # Omnibus           # 잔차의 분포가 정규성을 따르는지 확인
+        # 잔차는 실제 값과 모델의 예측값 사이의 차이를 의미
+        # 회귀 모델에서는 잔차가 정규 분포를 따를 때, 모델이 데이터를 적절하게 설명한다고 가정
+        # 디아고스티노 검정(D'Angostino's Test), 비대칭도와 첨도를 결합한 정규성 테스트이며 값이 클 수록 정규분포를 따름
+    # Prob(Omnibus)     # 디아고스티노 검정이 유의 확률
+        # 0.05이하일 경우 유의하다고 판단
+    # Skew(왜도)        # 평균 주위의 잔차들의 대칭하는지를 보는 것이며
+        # 0에 가까울수록 대칭
+    # Kurtosis(첨도)    # 잔차들의 분포 모양이며, 3에 가까울 수록 정규분포
+        # 음수이면 평평한 형태
+        # 양수는 뾰족한 형태
+    # Durbin – Watson   # 잔차의 독립성 확인할 수 있는 수치
+        # 0이면 잔차들이 양의 자기 상간관계, 2면 자기 상관관계 없는 독립성, 4면 잔차들이 임의 자기 상관관계를 가짐
+    # Jarque - Bera (JB)    # 자크베라 정규성 검정, 값이 클수록 정규분포의 데이터를 사용
+    # Cond. No          # 다중공선성(Multicollinearity) 검정
+        # 독립변수간 상관관계가 있는지 보는 것이며, 10이상이면 다중공선성이 있다고 판단
+            # 회귀모델에서 사용되는 독립 변수들 중 일부가 서로 매우 강하게 상관되어 있을 때 발생 → 변수제거
+```
+#### 왜도(Skewness)
+- 확률 분포가 평균을 중심으로 얼마나 비대칭적인지를 나타내는 통계량
+    - 왜도 값이 0이면 대칭적인 분포
+    - 양수이면 오른쪽으로 긴 꼬리, 왼쪽으로 치우침
+    - 음수이면 왼쪽으로 긴 꼬리, 오른쪽으로 치우침
+- 중요성
+    – 왜도를 통해 데이터가 정규분포(normal distribution) 에서 얼마나 벗어나 있는지 알 수 있음
+        » 왜도가 큰 경우 정규성 가정을 위반할 가능성이 크며, 검정 결과의 신뢰성이 떨어질 수 있음
+        » 경우에 따라, 로그 변환(log), 제곱근 변환(sqrt) 등을 통해 정규화(normalization)가 필요
+
+```
+>>> sample1 = wine[wine.columns.difference(['quality', 'type'])]
+>>> sample1 = sample1[0:5][:]
+>>> sample1_predict = regression_result.predict(sample1)
+>>> sample1_predict # 확인하기
+>>> wine[0:5]['quality'] # 'quality' 값 확인하기
+>>> data = {"fixed_acidity" : [8.5, 8.1], "volatile_acidity":[0.8, 0.5], "citric_acid":[0.3, 0.4], "residual_sugar":[6.1, 5.8], "chlorides":[0.055, 0.04],
+ "free_sulfur_dioxide":[30.0, 31.0], "total_sulfur_dioxide":[98.0, 99], "density":[0.996, 0.91], "pH":[3.25, 3.01], "sulphates":[0.4, 0.35], "alcohol":[9.0, 0.88]}
+
+>>> sample2 = pd.DataFrame(data, columns = sample1.columns)
+    # sample2 = pd.DataFrame(data)  # (columns = sample1.columns data딕셔너리 생성 시 키값 지정으로 생략 가능)
+>>> sample2 # 확인하기
+>>> sample2_predict = regression_result.predict(sample2)
+>>> sample2_predict
+```
+
+## 6.결과 시각화
+- 명령 프롬프트 창에서 다음 명령을 입력하여 seaborn 라이브러리 패키지를 설치
+`pip install seaborn`
+
+
+### 와인 유형에 따른 품질 등급 히스토그램 그리기
+```
+>>> import matplotlib.pyplot as plt
+>>> import seaborn as sns
+>>> sns.set_style('dark')   # one of {darkgrid, whitegrid, dark, white, ticks}
+>>> sns.histplot(red_wine_quality, kde = True, color = "red", label = 'red wine')
+    # <AxesSubplot:xlabel='quality', ylabel='Count’> 
+>>> sns.histplot(white_wine_quality, kde = True, label = 'white wine')  # `kde=False`인 경우 선 그래프 없어짐
+    # <AxesSubplot:xlabel='quality', ylabel='Count’> 
+>>> plt.title("Quality of Wine Type")
+    # Text(0.5, 1.0, 'Quality of Wine Type')
+>>> plt.legend()
+    # <matplotlib.legend.Legend object at 0x000001AEDA6D2F00>
+>>> plt.show()
+```
+
+### 부분 회귀 플롯(partial regression plot)으로 시각화
+- 독립 변수가 2개 이상인 경우에는 부분 회귀 플롯을 사용하여 하나의 독립 변수가 종속 변수에 미치는 영향력을 시각화 함으로써 결과를 분석할 수 있음
+
+```
+>>> import statsmodels.api as sm
+
+>>> others = list(set(wine.columns).difference(set(["quality", "fixed_acidity"])))
+>>> p, resids = sm.graphics.plot_partregress("quality", "fixed_acidity", others, data = wine, ret_coords = True)
+>>> plt.show()
+
+>>> fig = plt.figure(figsize = (8, 13))
+>>> sm.graphics.plot_partregress_grid(regression_result, fig = fig)
+    # <Figure size 800x1300 with 12 Axes>
+>>> plt.show()
+```
