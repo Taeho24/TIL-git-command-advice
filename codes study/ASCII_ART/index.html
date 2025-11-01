@@ -18,7 +18,7 @@
     #canvas, #ascii-canvas {
       display: block;
       margin-bottom: 10px;
-      border: 1px solid gray;
+      border: none;
     }
     #ascii-output {
       white-space: pre;
@@ -46,9 +46,14 @@
     <div style="margin:10px;">
         <label>이미지 크기 비율: <input id="scaleInput" type="number" min="0.1" max="1" step="0.1" value="1" style="width:50px;"> (0.1~1)</label>
         <label title="픽셀 간격이 너무 작으면 이미지가 너무 길어짐. 적당히 조절하세요."style="margin-left:15px;">변환 픽셀 간격(px): <input id="gapInput" type="number" min="1" max="20" step="1" value="5" style="width:50px;"></label>
-        <label style="margin-left:15px;">폰트 크기(px): <input id="fontSizeInput" type="number" min="2" max="20" step="1" value="5" style="width:50px;"></label>
+        <label style="margin-left:15px;">폰트 크기(px): <input id="fontSizeInput" type="number" min="2" max="20" step="1" value="6" style="width:50px;"></label>
         <br><br>
         <label>ASCII 문자셋: <input id="asciiInput" type="text" value="@$#Y!=+~- " style="width:200px;"></label>
+        <label style="margin-left:15px;">
+            <input type="checkbox" id="aspectRatioCheckbox" title="체크 시 왜곡 가능성 있음" checked>
+            비율 보정 (가로 늘리기)
+        </label>
+
         <button id="generateBtn" style="margin-left:15px;">다시 생성</button>
     </div>
 
@@ -83,7 +88,7 @@
         import { parseGIF, decompressFrames } from 'https://cdn.jsdelivr.net/npm/gifuct-js/+esm';
 
         const canvas = document.querySelector('canvas')
-        const ctx = canvas.getContext('2d')
+        const ctx = canvas.getContext('2d', { willReadFrequently: true })
         const asciiCanvas = document.getElementById('ascii-canvas');
         const asciiCtx = asciiCanvas.getContext('2d');
 
@@ -96,7 +101,9 @@
         const gapInput = document.getElementById('gapInput');
         const fontSizeInput = document.getElementById('fontSizeInput');
         const asciiInput = document.getElementById('asciiInput');
+        const resolutionSelect = document.getElementById('resolutionSelect');
         const generateBtn = document.getElementById('generateBtn');
+        const aspectFixCheckbox = document.getElementById('aspectRatioCheckbox');
 
         const transparentBgCheckbox = document.getElementById('transparentBgCheckbox');
         const downloadTxtBtn = document.getElementById('downloadTxtBtn');
@@ -105,7 +112,7 @@
         let asciiImage = '';        
         let currentImg = new Image();
         currentImg.crossOrigin = "anonymous";  // 만약 CORS 문제 생길 시
-        currentImg.src = ''; // # (선택사항)
+        //currentImg.src = ''; // # (선택사항)
 
         let animationFrames = null;
         let animationIndex = 0;
@@ -147,7 +154,7 @@
 
             // 원본 이미지 그리기
             ctx.clearRect(0, 0, width, height);
-            ctx.drawImage(sourceImage, 0, 0, width, height);
+            ctx.drawImage(sourceImage, 0, 0);
 
             // ASCII 캔버스 초기화
             asciiCtx.clearRect(0, 0, width, height);
@@ -213,10 +220,12 @@
 
         // 이미지 로드 이벤트
         currentImg.onload = () => {
+            canvas.style.border = '1px solid gray';
             generateASCIIFromImage(currentImg);
         };
 
         currentImg.onerror = () => {
+            canvas.style.border = 'none';
             if (!currentImg.src) {
                 alert('이미지 로드에 실패했습니다. 파일 경로나 네트워크 상태를 확인해주세요.');
             }
@@ -277,6 +286,18 @@
             }
         }
 
+        // 비율보정 함수
+        function aspectFix(charWidth, lineHeight){
+            const doFix = aspectFixCheckbox.checked;
+            const ratioFix = Math.max(lineHeight, charWidth) / Math.min(lineHeight, charWidth);
+            const isWidthSmaller = charWidth < lineHeight;
+
+            const aspectFixX = doFix && isWidthSmaller ? ratioFix : 1;
+            const aspectFixY = doFix && !isWidthSmaller ? ratioFix : 1;
+            
+            return [aspectFixX, aspectFixY]
+        }
+
         // 드래그 앤 드롭 기능 추가
         dropArea.addEventListener('dragover', e => {
             e.preventDefault();
@@ -317,6 +338,10 @@
             if (!fileName.toLowerCase().endsWith('.txt')) fileName += '.txt';
             
             const blob = new Blob([asciiImage], { type: 'text/plain' });
+            if (!blob) {
+                alert('다운로드에 실패했습니다. 다시 시도해주세요.');
+                return;
+            }
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
@@ -331,20 +356,45 @@
         // PNG 저장 버튼
         downloadPngBtn.addEventListener('click', () => {
             const baseFontSize = parseInt(fontSizeInput.value);
-            const baseGap = parseInt(gapInput.value);
-            const lines = asciiImage.trim().split('\n');
+            const lines = asciiImage.split('\n');
             const cols = lines[0]?.length || 0;
 
-            const resolutionSelect = document.getElementById('resolutionSelect');
             const scaleFactor = parseInt(resolutionSelect.value);
+
+            const fontSize = baseFontSize * scaleFactor;
 
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCtx.font = `${fontSize}px Consolas, monospace`;
 
-            const fontSize = baseFontSize * scaleFactor;
-            const gap = baseGap * scaleFactor;
-            const width = cols * gap * scaleFactor;
-            const height = lines.length * gap * scaleFactor;
+            const asciiChars = asciiInput.value;
+
+            //const sampleMetrics = tempCtx.measureText('　'); // U+3000
+
+            // 가장 넓은 문자 찾아서 크기 측정
+            let maxWidth = 0;
+            let maxAscent = 0;
+            let maxDescent = 0;
+            for (const ch of asciiChars) {
+                const metrics = tempCtx.measureText(ch);
+                if (metrics.width > maxWidth) maxWidth = metrics.width;
+                if (metrics.actualBoundingBoxAscent > maxAscent) maxAscent = metrics.actualBoundingBoxAscent || 0;
+                if (metrics.actualBoundingBoxDescent > maxDescent) maxDescent = metrics.actualBoundingBoxDescent || 0;
+            }
+            
+            const charWidth = maxWidth;
+            const lineHeight = maxAscent + maxDescent || fontSize;
+
+            // 비율보정
+            const [aspectFixX, aspectFixY] = aspectFix(charWidth, lineHeight)
+            
+            //유동적인 짤림방지 padding 계산(30%)
+            const horizontalPadding = Math.ceil(charWidth * 0.3);
+            const verticalPadding = Math.ceil(lineHeight * 0.3);
+
+            const width = Math.ceil(cols * charWidth * aspectFixX + horizontalPadding * 2);
+            const height = Math.ceil(lines.length * lineHeight * aspectFixY + verticalPadding * 2);
 
             tempCanvas.width = width;
             tempCanvas.height = height;
@@ -354,22 +404,25 @@
             if (!isTransparent) {
                 // 배경 흰색 채우기
                 tempCtx.fillStyle = 'white';
-                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                tempCtx.fillRect(0, 0, width, height);
             } else {
                 // 투명 배경 (기본 클리어)
-                tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+                tempCtx.clearRect(0, 0, width, height);
             }
 
-            tempCtx.fillStyle = 'black';
             tempCtx.font = `${fontSize}px Consolas, monospace`;
+            tempCtx.fillStyle = 'black';
             tempCtx.textBaseline = 'top';
-            tempCtx.textAlign = 'left'; // 명시목적
+            tempCtx.textAlign = 'left'; // 왼쪽 정렬
 
             lines.forEach((line, rowIndex) => {
-                for (let col = 0; col < line.length; col++) {
-                const char = line[col];
-                tempCtx.fillText(char, col * gap * scaleFactor, rowIndex * gap * scaleFactor);
-                }
+                const x = horizontalPadding;
+                const y = verticalPadding + rowIndex * lineHeight * aspectFixY;
+                tempCtx.save();
+                tempCtx.translate(x, y);
+                tempCtx.scale(aspectFixX, aspectFixY);
+                tempCtx.fillText(line, 0, 0);
+                tempCtx.restore();
             });
 
             let fileName = prompt("저장할 파일 이름을 입력하세요 (확장자 없이):", "ascii-art");
@@ -381,6 +434,10 @@
 
             // Blob으로 변환 후 다운로드
             tempCanvas.toBlob(blob => {
+                if (!blob) {
+                    alert('다운로드에 실패했습니다. 다시 시도해주세요.');
+                    return;
+                }
                 const url = URL.createObjectURL(blob);
                 // 결과물 새창열기
                 window.open(url, '_blank');
