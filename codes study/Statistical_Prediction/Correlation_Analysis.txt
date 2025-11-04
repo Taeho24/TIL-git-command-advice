@@ -101,7 +101,7 @@
 2. 특정 변수 사이의 상관 계수를 구하기
 ```
 >>> titanic['survived'].corr(titanic['adult_male’])
-# np.float64(0.2573065223849622)
+
 >>> titanic['survived'].corr(titanic['fare’])
 # np.float64(0.2573065223849622)
 ```
