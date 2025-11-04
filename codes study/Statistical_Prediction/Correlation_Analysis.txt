@@ -93,6 +93,9 @@
 
 >>> titanic_corr = titanic_new.corr(method = 'pearson')
 >>> titanic_corr # 확인하기
+
+ >>> titanic_corr.to_csv('C:/Users/testDataSet/titanic_corr.csv', index = False)
+    # CSV 파일로 저장
 ```
 
 2. 특정 변수 사이의 상관 계수를 구하기
@@ -108,7 +111,7 @@
 ```
 >>> sns.pairplot(titanic, hue = 'survived')
     # <seaborn.axisgrid.PairGrid object at 0x000001710D852A58>
-02 >>> plt.show()
+>>> plt.show()
 ```
 
 2. 두 변수의 상관관계 시각화하기
@@ -140,7 +143,7 @@
 >>> titanic['age2'] = titanic['age'].apply(category_age)
 >>> titanic['sex'] = titanic['sex'].map({'male':1, 'female':0})
 >>> titanic['family'] = titanic['sibsp'] + titanic['parch'] + 1
->>> titanic.to_csv('C:/Users/BongjaeKim/My_Python/7장_data/titanic3.csv', index = False)
+>>> titanic.to_csv('C:/Users/testDataSet/titanic3.csv', index = False)
 >>> heatmap_data = titanic[['survived', 'sex', 'age2', 'family', 'pclass', 'fare']]
 >>> colormap = plt.cm.RdBu
 >>> sns.heatmap(heatmap_data.astype(float).corr(), linewidths = 0.1, vmax = 1.0, square = True, cmap = colormap,
