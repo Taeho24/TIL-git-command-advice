@@ -1,5 +1,13 @@
-## user name setting commends
+# user name setting commends
 
-# git config --list
-# git config user.name "Git name"
-# git config user.email "Git email"
+## git config --list
+## git config user.name "Git name"
+## git config user.email "Git email"
+
+
+# jupyter notebook commit output setting
+
+## !pip install nbstripout
+## !nbstripout --install
+## git config --list | grep nbstripout
+### filter.nbstripout.clean=*  (설정 완료)
