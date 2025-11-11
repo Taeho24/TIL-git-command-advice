@@ -37,6 +37,7 @@ TIL-git-command-advice/
 │   ├── Mono-Alphabetic Substitution Cipher/
 │   ├── Sorting_Algorithm/
 │   ├── Ubuntu_Ccode_study/
+│   ├── Text_Frequency_Analysis/
 │   └── Statistical_Prediction/
 │       ├── Description_Statistics.txt
 │       └── Correlation_Analysis.txt
