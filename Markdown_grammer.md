@@ -108,7 +108,7 @@ This is a normal paragraph:
 end code block.
 ```
 
-### 2.4.1. 코드블럭
+### 2.4.2. 코드블럭
 코드블럭은 다음과 같이 2가지 방식을 사용할 수 있습니다:
 
 * `<pre><code>{code}</code></pre>` 이용방식
@@ -180,7 +180,7 @@ public class BootSpringBootApplication {
 
 
 ## 2.6. 링크
-* 참조링크
+## 2.6.1 참조링크
 
 ```
 [link keyword][id]
@@ -194,7 +194,7 @@ Link: [Google][googlelink]
 ```
 
 
-* 외부링크 & 인라인 링크
+## 2.6.2 외부링크 & 인라인 링크
 ```
 사용문법: [Title](link)
 적용 예: [Google](https://google.com, "google link")
@@ -209,7 +209,7 @@ Link: [Google][googlelink]
   3. 특수문자 제거(대부분)
 
 
-* 자동연결
+## 2.6.3 자동연결
 ```
 일반적인 URL 혹은 이메일주소인 경우 적절한 형식으로 링크를 형성한다.
 
