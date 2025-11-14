@@ -191,8 +191,9 @@ public class BootSpringBootApplication {
 Link: [Google][googlelink]
 
 [googlelink]: https://google.com "Go google"
-```
 
+툴팁에는 "Go google"(title)이 표시됨.
+```
 
 ## 2.6.2 외부링크 & 인라인 링크
 ```
@@ -208,6 +209,18 @@ Link: [Google][googlelink]
   2. 공백 → 하이픈(-) 로 변환
   3. 특수문자 제거(대부분)
 
+- ***GitHub README에서 같은 제목이 두 개 이상 있을 때* 자동으로 중복 방지용 번호(-1, -2 …) 가 뒤에 붙습니다.**
+```
+예시 제목들
+## Contact
+## Contact
+## contact
+
+자동 생성되는 앵커
+[Contact](#contact)
+[Contact](#contact-1)
+[Contact](#contact-2)
+```
 
 ## 2.6.3 자동연결
 ```
@@ -239,36 +252,64 @@ __double underscores__
 ![석촌호수 러버덕](http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0)
 ![석촌호수 러버덕](http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0 "RubberDuck")
 
-사이즈 조절 기능은 없기 때문에 ```<img width="" height=""></img>```를 이용한다.
+- 사이즈 조절 기능은 없기 때문에 `<img width="" height="">`를 이용한다.
+
+- 정렬기능
+  - `<p align="left">`: <p> 전체 내용 왼쪽 정렬
+  - `<p float="left">`: 이미지를 왼쪽에 띄우고, 텍스트가 오른쪽에 감싸지는 방식 (CSS float 느낌)
+
+| 비교        | align                | float                  |
+| --------- | -------------------- | ---------------------- |
+| 정렬 범위     | 부모 블록 전체             | 특정 요소만 띄움              |
+| 주변 텍스트 처리 | 블록 전체 이동, 텍스트 감싸지 않음 | 요소 주변 텍스트 감싸기 가능       |
+| 사용 목적     | 가운데/왼쪽/오른쪽 정렬        | 나란히 배치, 텍스트와 이미지 혼합    |
+| GitHub 지원 | 안정적                  | 제한적 (모바일/화면 크기에 따라 다름) |
 
 예
 ```
-<img src="/path/to/img.jpg" width="450px" height="300px" title="px(픽셀) 크기 설정" alt="RubberDuck"></img><br/>
-<img src="/path/to/img.jpg" width="40%" height="30%" title="px(픽셀) 크기 설정" alt="RubberDuck"></img>
+<p align="center">
+  <img src="/path/to/img.jpg" width="450px" height="300px" title="px(픽셀) 크기 설정" alt="RubberDuck"><br/>
+  <img src="/path/to/img.jpg" width="40%" height="30%" title="px(픽셀) 크기 설정" alt="RubberDuck">
+</p>
 ```
+<p align="center">
+  <img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" width="450px" height="300px" title="px(픽셀) 크기 설정" alt="RubberDuck"><br/>
+  <img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" width="40%" height="30%" title="%(비율) 크기 설정" alt="RubberDuck">
+</p>
 
-<img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" width="450px" height="300px" title="px(픽셀) 크기 설정" alt="RubberDuck"></img><br/>
-<img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" width="40%" height="30%" title="%(비율) 크기 설정" alt="RubberDuck"></img>
+- **이미지 + 링크 (Clickable Image)**
+```
+[![석촌호수 러버덕](http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0 "RubberDuck")](http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0)
+
+<a href="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" target="_blank">
+  <img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" alt="석촌호수 러버덕" title="RubberDuck">
+</a>
+```
+[![석촌호수 러버덕](http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0 "RubberDuck")](http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0)
+
+<a href="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" target="_blank">
+  <img src="http://cfile6.uf.tistory.com/image/2426E646543C9B4532C7B0" alt="석촌호수 러버덕" title="RubberDuck">
+</a>
 
 ## 2.9. 줄바꿈
-1. 3칸 이상 띄어쓰기(` `)를 하면 줄이 바뀐다.
+1. 2칸 이상 띄어쓰기(` `)를 하면 줄이 바뀐다.
 
 ```
-* 줄 바꿈을 하기 위해서는 문장 마지막에서 3칸이상을 띄어쓰기해야 한다.___\\ 띄어쓰기
+* 줄 바꿈을 하기 위해서는 문장 마지막에서 2칸이상을 띄어쓰기해야 한다.__\\ 띄어쓰기
 이렇게
 ```
 
-* 줄 바꿈을 하기 위해서는 문장 마지막에서 3칸이상을 띄어쓰기해야 한다.   \
+* 줄 바꿈을 하기 위해서는 문장 마지막에서 3칸이상을 띄어쓰기해야 한다.  \
 이렇게
 
 2. `<br>`태그 사용
 ```
 첫 번째 줄입니다.<br>
-두 번째 줄입니다.___[ENTER]
+두 번째 줄입니다.__[ENTER]
 세 번째 줄입니다.
 ```
 첫 번째 줄입니다.<br>
-두 번째 줄입니다.   \
+두 번째 줄입니다.  \
 세 번째 줄입니다.
 
 
