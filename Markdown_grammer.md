@@ -197,8 +197,16 @@ Link: [Google][googlelink]
 * 외부링크 & 인라인 링크
 ```
 사용문법: [Title](link)
-적용예: [Google](https://google.com, "google link")
+적용 예: [Google](https://google.com, "google link")
+
+// 띄어쓰기가 있는 경우 "-"사용
+[Contact or contributors](#contact-or-contributors)
 ```
+
+- ***앵커(Anchor) ID 변환 규칙***
+  1. 모두 소문자로 변환
+  2. 공백 → 하이픈(-) 로 변환
+  3. 특수문자 제거(대부분)
 
 
 * 자동연결
