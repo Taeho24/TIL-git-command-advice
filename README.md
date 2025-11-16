@@ -38,6 +38,10 @@ TIL-git-command-advice/
 │   ├── Sorting_Algorithm/
 │   ├── Ubuntu_Ccode_study/
 │   ├── Text_Frequency_Analysis/
+│   │   ├── frequency_Analysis_Eng.ipynb
+│   │   └── frequency_Analysis_kr.ipynb
+│   ├── Regression_Analysis/
+│   │   └── linear_Regression.ipynb
 │   └── Statistical_Prediction/
 │       ├── Description_Statistics.txt
 │       └── Correlation_Analysis.txt
