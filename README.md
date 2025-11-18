@@ -42,6 +42,9 @@ TIL-git-command-advice/
 │   │   └── frequency_Analysis_kr.ipynb
 │   ├── Regression_Analysis/
 │   │   └── linear_Regression.ipynb
+│   ├── Classification_Analysis/
+│   │   ├── logistic_Regression.ipynb
+│   │   └── decision_Tree_Regression.ipynb
 │   └── Statistical_Prediction/
 │       ├── Description_Statistics.txt
 │       └── Correlation_Analysis.txt
