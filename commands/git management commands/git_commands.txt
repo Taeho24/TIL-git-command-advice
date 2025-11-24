@@ -33,7 +33,7 @@
 03. 2에서 만든 브랜치에 커밋을 만든다.
     - 이때 커밋 메시지엔 이슈 번호를 적어서, 이슈 트레커와 커밋을 연동시킨다.
 04. git push 명령어를 사용해서 작업중인 브랜치에 있는 모든 커밋들을 원격 저장소에 push 한다.
-    - `git push -u origin 브랜치이름`
+    - `git push -u origin 브랜치이름` (or)  `git push --set-upstream origin 브랜치이름`
     - `git push`
 05. 원격 저장소에서 Pull Request(Merge Reqest)를 생성한다.
 06. 코드 리뷰를 받는다(선택).
@@ -97,16 +97,13 @@ github cosmos-kit
 .git이라는 숨김파일이 있으면 저장소임
 커밋 이력(히스토리)는 .git 폴더에 있음
 
-과제전형
-"이 사람이 코딩을 할 때 이력을 잘 작성해서 썼는지"
+
 .git 폴더를 지우면, 저장소가 일반 폴더가 된다.
 git init 명령어 입력시, 해당 경로에 있는 폴더가 일반 폴더에서 저장가 된다.
 
-https://github.com/boostcampwm-2022
-이슈트랙커
+[참조-이슈트랙커](https://github.com/boostcampwm-2022)
 commit 메시지에 연동
 
-# 마크다운 문법공부!
 
 `git remote add origin [깃헙주소]`
 - [깃헙주소]를 origin 이라는 명칭으로 즐겨찾기생성
@@ -114,7 +111,7 @@ commit 메시지에 연동
 `git branch -M main` (Master branch를 Main branch로 변경)
 `git push origin main `
 
-# 2024-03-21
+
 //default branch가 master이름일때 main으로 바꾸는법
 git branch -m master main
 git fetch origin
