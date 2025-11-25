@@ -37,18 +37,19 @@ TIL-git-command-advice/
 │   ├── Mono-Alphabetic Substitution Cipher/
 │   ├── Sorting_Algorithm/
 │   ├── Ubuntu_Ccode_study/
-│   ├── Text_Frequency_Analysis/
-│   │   ├── frequency_Analysis_Eng.ipynb
-│   │   └── frequency_Analysis_kr.ipynb
-│   ├── Regression_Analysis/
-│   │   └── linear_Regression.ipynb
-│   ├── Classification_Analysis/
-│   │   ├── logistic_Regression.ipynb
-│   │   └── decision_Tree_Regression.ipynb
-│   ├── Cluster_Analysis/
-│   └── Statistical_Prediction/
-│       ├── Description_Statistics.txt
-│       └── Correlation_Analysis.txt
+│   └── Data_Mining/
+│       ├── Text_Frequency_Analysis/
+│       │   ├── frequency_Analysis_Eng.ipynb
+│       │   └── frequency_Analysis_kr.ipynb
+│       ├── Regression_Analysis/
+│       │   └── linear_Regression.ipynb
+│       ├── Classification_Analysis/
+│       │   ├── logistic_Regression.ipynb
+│       │   └── decision_Tree_Regression.ipynb
+│       ├── Cluster_Analysis/
+│       └── Statistical_Prediction/
+│           ├── Description_Statistics.txt
+│           └── Correlation_Analysis.txt
 └─── commands/
     ├── venv activate.txt
     ├── Django start command/
