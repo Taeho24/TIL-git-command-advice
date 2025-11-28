@@ -1,0 +1,73 @@
+<!-- React 구현해보기 : data-bind='age'-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React_framework</title>
+</head>
+<body>
+
+    안녕하세요 제 나이는 <span data-bind="age"></span>
+
+    <button onclick="data.age++">+</button>
+    <button onclick="data.age--">-</button>
+
+    <script>
+        // data: Poxy
+        let data = useData({
+            age : 25,
+            name: 'Taeho24'
+        })
+
+        const DB = {
+            
+        }
+        
+        // like useState()
+        function useData(data){
+            let proxy = new Proxy(data, {
+                // data 읽을 때 대신 실행할 코드
+                get(obj, prop){
+                    return obj[prop] // Reflect 문법 참고
+                },
+                // data 수정할 때 대신 실행할 코드
+                set(obj, prop, val){
+                    obj[prop] = val
+                    // re_rendering()
+                    if (DB[prop]){
+                        DB[prop]()
+                    }
+                    return true
+                }
+            })
+            return proxy
+        }
+
+        /*
+        function re_rendering(){
+            let html = document.querySelectorAll('[data-bind]')
+            html.forEach((a)=>{
+                let attribute = a.getAttribute('data-bind')
+                a.innerText = data[attribute]
+            })
+        }
+        */
+
+        let html = document.querySelectorAll('[data-bind]')
+        html.forEach((a)=>{
+            let attribute = a.getAttribute('data-bind')
+        
+            const update = () => {
+                a.innerText = data[attribute]
+        
+            }
+            update()
+            DB[attribute] = update
+        })
+
+    </script>
+
+</body>
+</html>
