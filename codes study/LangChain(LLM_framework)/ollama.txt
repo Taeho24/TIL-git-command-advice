@@ -1,0 +1,111 @@
+# LangChain(& ollama)
+
+기본적으로, 'chat'버전의 모델이 사용됨(llama2 == llama2:chat)
+만약 original foundation 모델 사용하고자 할 경우에는 뒤에 ':text'를 붙임 (ollama run llama2:text)
+
+| 모델                 | 설명                                 | 명령어                          |
+| ------------------ | -------------------------------------- | ------------------------------ |
+| Llama 3            | 가장 인기 있는 범용 모델                | `ollama run llama3`            |
+| Mistral            | Mistral AI에서 공개한 70억 파라미터 모델 | `ollama run mistral`           |
+| CodeLlama          | 코드 생성에 특화된 모델                 | `ollama run codellama`         |
+| Llama 2 Uncensored | 검열되지 않은 Llama 2 모델              | `ollama run llama2-uncensored` |
+| Orca Mini          | 입문용 30억 파라미터 모델               | `ollama run orca-mini`         |
+
+
+- Install(공식 github 를 참고하는 것이 좋은 방법)
+`$ curl -fsSL https://ollama.com/install.sh | sh`
+
+- 기본적인 명령어 소개
+`$ ollama creat | pull | run`
+
+- 다운로드받은 모델 서버로 구동하기
+`$ ollama serve`
+    - Key generation: private & public key files will be generated automatically.
+        - Location: ~/.ollama/id_ed25519
+    - Server starts at port 11434 (default)
+
+- Query & Response [Token 단위로 생성된 결과가 연속해서 나옴]
+`$ curl http://localhost:11434/api/generate -d '{ "model": "llama3", "prompt":"Why is the sky blue?" }'`
+
+- Llama-3 8B download (Do NOT follow this. Just watch!)
+`$ ollama pull llama3`
+    - Download location:  /usr/share/ollama/.ollama/models/
+[주의] 위 경로에 많은 모델들이 저장되면서 저장장치 공간이 부족해질 수 있음 
+[참고] soft link 를 통하여 HDD 쪽으로 연결해줌으로써 문제 해결 가능`
+
+- 사용해보기: `$ ollama run llama3`
+
+- GPU 사용 확인: `$ nvidia-smi`
+
+- System instruction 설정해보기
+예시: `/set system You are a doom-slayer. Say anything loud!`
+
+- 기존 설정 지우고, System instruction 재설정: `/clear`
+
+--- 
+
+LangChain (+ Ollama) : RAG
+- 대규모 언어 모델(LLM)을 기반으로 애플리케이션을 구축하기 위한 오픈 소스 프레임워크
+[Install]
+`$ pip3 install langchain_community`
+- Ollama server 띄운 후, 아래와 같이 query & response
+```
+[ test01.py ]
+
+from langchain_community.llms import Ollama
+ollama = Ollama(
+    base_url='http://localhost:11434',
+    model="llama3"
+)
+print(ollama.invoke("why is the sky blue"))
+```$ python test01.py
+
+
+Web documents 를 대상으로 query & response
+- Web documents 를 읽어들이기 위해 bs4 설치 필요 ( $ pip3 install bs4 )
+- Vector database 를 사용하기 위해 FAISS 설치 ( $ pip3 install faiss-gpu )
+    - [optional] Vector database 를 사용하기 위해 chromadb 설치 필요 ( $ pip3 install chromadb )
+        - 의존성 걸려있는 다른 패키지 설치 또는 업데이트 필요할 수 있음 (예: sqlite3 등)
+
+Ollama 서버 실행 ( $ ollama serve )
+    - 11434 port 사용하는 것으로 가정
+
+Ollama 에서 사용할 모델을 미리 pull 받기
+    - `$ ollama pull nomic-embed-text`
+    - [llama3 를 아직 pull 받지 않은 경우에만 실행] `$ ollama pull llama3`
+
+```
+# 필요한 모듈 import
+from langchain_community.document_loaders import WebBaseLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import FAISS
+#from langchain_community.vectorstores import Chroma
+from langchain.chains import RetrievalQA
+from langchain_community.llms import Ollama
+
+# ‘llama3’ 를 사용하도록 서버 연결 객체 생성
+ollama = Ollama(base_url='http://localhost:11434', model="llama3")
+# Web 문서 읽어들임
+loader = WebBaseLoader("https://en.wikipedia.org/wiki/Liancourt_Rocks")
+data = loader.load()
+# 읽은 Web 문서를 적당한 단위로 자름 (자른 문서들을 ‘문서 chunk’라고 부르도록 하자)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0) # '독도'에 대한 문서
+all_splits = text_splitter.split_documents(data)
+# Vector embedding 용도로 ‘nomic-embed-text’ 모델을 사용하도록 객체 생성
+oembed = OllamaEmbeddings(base_url="http://localhost:11434", model="nomic-embed-text")
+# 각 ‘문서 chunk’에 대한 vector representation 생성
+vectorstore = FAISS.from_documents(documents=all_splits, embedding=oembed)
+# 질문을 결정하고, 관련 ‘문서 chunk’ 찾기
+question="Are Liancourt Rocks Korea territory?"
+docs = vectorstore.similarity_search(question)
+# 찾아낸 ‘문서 chunk’를 이용하지 않은 답변출력
+print(ollama.invoke(question))
+
+# '문서 chunk'를 이용하여 답변 생성하기 위한 'Chain' 생성
+qachain=RetrievalQA.from_chain_type(ollama, retriever=vectorstore.as_retriever())
+# 답변 생성 
+res = qachain.invoke({"query": question})
+print(res['result'])
+```
+
