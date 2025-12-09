@@ -54,7 +54,9 @@ TIL-git-command-advice/
 │       ├── Statistical_Prediction/
 │       │   ├── Description_Statistics.txt
 │       │   └── Correlation_Analysis.txt
-│       └── Sentiment_Analysis/
+│       ├── Sentiment_Analysis/
+│       └── Deep_Leaning_Based_Analysis/
+│           └── LSTM_stockPrice_Analysis.ipynb
 └─── commands/
     ├── venv activate.txt
     ├── Django start command/
