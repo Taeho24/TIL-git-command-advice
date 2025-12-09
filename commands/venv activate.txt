@@ -1,8 +1,10 @@
-# 파이썬 개발환경 설정
+# 가상환경 설정
+
+## 파이썬 개발환경 설정
 ~$ sudo apt update
 ~$ sudo apt install python3-dev pthon3-pip python3-venv
 
-# 가상환경 실행
+## 가상환경 실행
 ~$ python -m venv --system-site-packages ~/venv
 
 Windows :
@@ -13,5 +15,31 @@ macOS / Linux :
 1. python3 -m venv [가상환경이름]
 2. source [가상환경이름]/bin/activate
 
-# 가상환경 실행취소
+## 가상환경 실행취소
 ~$ deactivate
+
+--- 
+
+## jupyter notebook 개발 환경 확인
+1. Anaconda Prompt 열기
+2. `conda info --envs` or `conda-env list`
+
+## 가상환경 생성
+~$ conda create -n [가상환경이름] [python=버전] # python버전 지정은 선택사항
+
+## 가상환경 삭제
+~$ conda remove --name [가상환경이름] [--all]
+
+## 가상환경 실행
+~$ conda activate [가상환경이름]
+
+## 가상환경 실행취소
+~$ conda deactivate
+
+## 가상환경 연결
+(가상환경 활성화) ~$ pip install jupyter notebook
+
+~$ python -m ipykernel install --user --name [가상환경이름] --display-name "[커널출력이름]"
+
+## 커널 연결 해제(가상환경 삭제X)
+~$ jupyter kernelspec uninstall 가상환경이름
